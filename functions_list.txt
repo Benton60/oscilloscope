@@ -4,7 +4,7 @@ Benton Hershberger && Ethan Watkins
 Functions List:
 
 read_adc_voltage()      Driver          Highest
-    1) GPIO -> single number representing voltage from 0 to 3.3V -> mutex wrapping an array for get_voltage_points()
+    1) GPIO & Interupt -> single number representing voltage from 0 to 3.3V -> queue for get_voltage_points()
 read_trigger_buttons()  Driver          Low
     1) GPIO -> single number -1,0,1 to represent trigger button state -> integer from get_trigger_value() 
 set_trigger_value()     DataHolder      Medium
@@ -14,7 +14,7 @@ draw_SPI_screen()       Driver          Very High
 draw_char_screen()      Driver          Low
     1) time & amplitude from queue -> GPIO interface with display
 holder_voltage_points()    DataHolder      Very High
-    1) read_adc_voltage mutex wrapped array + set_trigger_value + get_amplitude_scale + get_time_scale -> computes the appropriate data points to use and their coordinates -> draw_SPI_screen mutex wrapped array
+    1) read_adc_voltage queue + set_trigger_value + get_amplitude_scale + get_time_scale -> computes the appropriate data points to use and their coordinates -> draw_SPI_screen mutex wrapped array
 read_time_dial()        Driver          Low
     1) GPIO -> single number -1,0,1 to represent dial state -> integer from get_time_scale
 get_time_scale()        DataHolder      Medium
