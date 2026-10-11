@@ -1,0 +1,22 @@
+API DOCUMENTATION
+
+
+Voltage Data Points Holder
+    queue for the incoming voltages triggered by the interrupt  -> input
+    queue for the trigger value                                 -> input 
+    queue for amplitude value                                   -> input
+    queue for time value                                        -> input
+    mutex for the spi screen buffer                             -> output
+
+Time Dial Driver
+    queue for Voltage Data Points Holder                        -> output
+    wueue for Char Display Driver                               -> output
+
+Amplitude Dial Driver  
+    queue for Voltage Data Points Holder                        -> output
+    wueue for Char Display Driver                               -> output
+
+Trigger Dial Driver
+    queue for Voltage Data Points Holder                        -> output
+
+
