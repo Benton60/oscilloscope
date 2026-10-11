@@ -19,4 +19,9 @@ Amplitude Dial Driver
 Trigger Dial Driver
     queue for Voltage Data Points Holder                        -> output
 
+Char Display Driver
+    queue for Voltage Dial Driver                               -> input
+    queue for Time Dial Driver                                  -> input
 
+SPI Display Driver
+    mutex for spi screen buffer                                 -> input
