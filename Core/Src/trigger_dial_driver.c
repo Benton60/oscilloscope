@@ -5,7 +5,14 @@
  *      Author: ethanwatkins
  */
 
+#include "trigger_dial_driver.h"
+
 void read_trigger_buttons()
+{
+	return; /*TODO*/
+}
+
+void get_trigger_value()
 {
 	return; /*TODO*/
 }
