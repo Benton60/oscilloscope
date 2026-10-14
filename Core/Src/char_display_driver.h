@@ -4,7 +4,11 @@
  *  Created on: Oct 11, 2026
  *      Author: ethanwatkins
  */
-
+/*
+Char Display Driver
+    queue for Voltage Dial Driver                               -> input
+    queue for Time Dial Driver                                  -> input
+*/
 #ifndef SRC_CHAR_DISPLAY_DRIVER_H_
 #define SRC_CHAR_DISPLAY_DRIVER_H_
 
