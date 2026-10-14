@@ -1,4 +1,5 @@
 Debug/
+Core/.DS_Store
 Release/
 .settings/
 *.launch
