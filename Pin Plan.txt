@@ -1,0 +1,9 @@
+ADC1_IN0 : PC0
+
+Encoder : PC1 & PC2 for Time, PC3 & PC4 for Amplitude
+
+Buttons : PA5 & PA6 for Trigger Level
+
+SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select
+
+Character Display : Any/All PB pins
