@@ -104,10 +104,34 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN defaultTask */
+    //SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select, PC8 for Data/Command
+    LL_SPI_Enable(SPI1);
+
+
+    //Initialization sequence, I can't be bothered to explain what each byte does.
+    GPIOC->ODR &= ~(1<<8); //these are all commands
+    int init[] = {0x40, 0xa1, 0xc0, 0xa4, 0xa6, 0xa2, 0x2f, 0x27, 0x81, 0x10, 0xfa, 0x90, 0xaf}; 
+    for(int i = 0; i < 13; i++){
+        GPIOC->ODR &= ~(1<<7);
+        LL_SPI_TransmitData8(SPI1, init[i]);
+        for(int j = 0; j < 1234; j++){
+            if(!LL_SPI_IsActiveFlag_BSY(SPI1))
+                break;
+        }
+        GPIOC->ODR |= (1<<7);
+    }
+    GPIOC->ODR |= (1<<8); //We have finished sending commands so now we can send data
   /* Infinite loop */
-  for(;;)
+  for(int8_t i = 0; ;i++)
   {
-    osDelay(1);
+    GPIOC->ODR &= ~(1<<7);
+    LL_SPI_TransmitData8(SPI1, i);
+    for(int j = 0; j < 1234; j++){
+        if(!LL_SPI_IsActiveFlag_BSY(SPI1))
+            break;
+    }
+    GPIOC->ODR |= (1<<7);
+    osDelay(1000);
   }
   /* USER CODE END defaultTask */
 }
