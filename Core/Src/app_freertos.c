@@ -107,7 +107,9 @@ void StartDefaultTask(void *argument)
     //SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select, PC8 for Data/Command
     LL_SPI_Enable(SPI1);
 
+    for(int i = 0; i < 2234; i++){
 
+    }
     //Initialization sequence, I can't be bothered to explain what each byte does.
     GPIOC->ODR &= ~(1<<8); //these are all commands
     int init[] = {0x40, 0xa1, 0xc0, 0xa4, 0xa6, 0xa2, 0x2f, 0x27, 0x81, 0x10, 0xfa, 0x90, 0xaf}; 
