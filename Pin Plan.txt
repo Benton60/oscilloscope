@@ -1,3 +1,7 @@
+Benton Hershberger
+Ethan Watkins
+
+
 ADC1_IN0 : PC0
 
 Encoder : PC1 & PC2 for Time, PC3 & PC4 for Amplitude
