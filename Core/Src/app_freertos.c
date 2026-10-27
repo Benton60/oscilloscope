@@ -104,25 +104,20 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN defaultTask */
-    //SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select, PC8 for Data/Command
+    //SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select, PC8 for Data/Command, PC9 for Reset
     LL_SPI_Enable(SPI1);
     
     GPIOC->ODR &= ~(1<<9); //drive the screen reset low aka reset the screen before initialization
-    for(int i = 0; i < 2234; i++){
-
-    }
+    osDelay(4000);
     GPIOC->ODR |= (1<<9); //drive reset back high 
 
     //Initialization sequence, I can't be bothered to explain what each byte does.
     GPIOC->ODR &= ~(1<<8); //these are all commands
-    int init[] = {0xe2, 0x40, 0xa1, 0xc0, 0xa4, 0xa6, 0xa2, 0x2f, 0x27, 0x81, 0x10, 0xfa, 0x90, 0xaf, 0xa5}; 
-    for(int i = 0; i < 15; i++){
+    int init[] = {0x40, 0xa1, 0xc0, 0xa4, 0xa6, 0xa2, 0x2f, 0x27, 0x81, 0x10, 0xfa, 0x90, 0xaf}; 
+    for(int i = 0; i < 16; i++){
         GPIOC->ODR &= ~(1<<7);
         LL_SPI_TransmitData8(SPI1, init[i]);
-        for(int j = 0; j < 1234; j++){
-            if(!LL_SPI_IsActiveFlag_BSY(SPI1))
-                break;
-        }
+        osDelay(100);
         GPIOC->ODR |= (1<<7);
     }
     GPIOC->ODR |= (1<<8); //We have finished sending commands so now we can send data
