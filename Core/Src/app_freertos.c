@@ -26,6 +26,7 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -50,6 +51,18 @@ const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 128 * 4
+};
+/* Definitions for char_diplay */
+osThreadId_t char_diplayHandle;
+uint32_t MyBufferTask02[ 128 ];
+osStaticThreadDef_t MycontrolBlocTask02;
+const osThreadAttr_t char_diplay_attributes = {
+  .name = "char_diplay",
+  .stack_mem = &MyBufferTask02[0],
+  .stack_size = sizeof(MyBufferTask02),
+  .cb_mem = &MycontrolBlocTask02,
+  .cb_size = sizeof(MycontrolBlocTask02),
+  .priority = (osPriority_t) osPriorityLow,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -84,6 +97,9 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* creation of char_diplay */
+  char_diplayHandle = osThreadNew(StartTask02, NULL, &char_diplay_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -134,6 +150,24 @@ void StartDefaultTask(void *argument)
     osDelay(1000);
   }
   /* USER CODE END defaultTask */
+}
+
+/* USER CODE BEGIN Header_StartTask02 */
+/**
+* @brief Function implementing the char_diplay thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask02 */
+void StartTask02(void *argument)
+{
+  /* USER CODE BEGIN char_diplay */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END char_diplay */
 }
 
 /* Private application code --------------------------------------------------*/
