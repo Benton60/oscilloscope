@@ -11,3 +11,13 @@ void draw_char_screen()
 {
 	return; /*TODO*/
 }
+
+void init_char_display()
+{
+	return;
+}
+
+void command(char i)
+{
+	return;
+}

@@ -13,5 +13,9 @@ Char Display Driver
 #define SRC_CHAR_DISPLAY_DRIVER_H_
 
 void draw_char_screen();
-
+void init_char_display();
+// Initialization Functions
+void command(char i);
+void write(char i);
+void init();
 #endif /* SRC_CHAR_DISPLAY_DRIVER_H_ */
