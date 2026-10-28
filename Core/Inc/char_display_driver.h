@@ -18,4 +18,5 @@ void init_char_display();
 void command(char i);
 void write(char i);
 void init();
+void myDelay(int ms);
 #endif /* SRC_CHAR_DISPLAY_DRIVER_H_ */

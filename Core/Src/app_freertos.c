@@ -123,7 +123,10 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN defaultTask */
     init_spi_screen();
     clear_screen();
-    for(;;);
+    for(;;)
+    {
+    	osDelay(10000);
+    }
   /* USER CODE END defaultTask */
 }
 
@@ -138,7 +141,14 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN char_diplay */
 	init();
+	command(0x01);
+	osDelay(2);
+	command(0x0E);
 	write('H');
+	write('E');
+	write('L');
+	write('L');
+	write('O');
   /* Infinite loop */
   for(;;)
   {
