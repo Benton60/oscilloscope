@@ -141,14 +141,21 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN char_diplay */
 	init();
-	command(0x01);
-	osDelay(2);
-	command(0x0E);
-	write('H');
-	write('E');
-	write('L');
-	write('L');
+	write(0x7E);
+	write('C');
 	write('O');
+	write('O');
+	write('L');
+	write(0x10);
+	write('D');
+	write('I');
+	write('S');
+	write('P');
+	write('L');
+	write('A');
+	write('Y');
+	write(0x7F);
+	write(0x10);
   /* Infinite loop */
   for(;;)
   {

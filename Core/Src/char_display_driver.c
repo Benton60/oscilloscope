@@ -42,15 +42,17 @@ void write(char i)
 void init()
 {
 	GPIOB -> ODR &= ~(1<<10);
-	osDelay(100);
+	osDelay(45);
 	command(0x30);
-	osDelay(30);
+	osDelay(5);
 	command(0x30);
-	osDelay(10);
+	osDelay(1);
 	command(0x30);
-	osDelay(10);
+	osDelay(1);
 	command(0x38);
 	command(0x10);
 	command(0x0c);
 	command(0x06);
+	command(0x01);
+	osDelay(2);
 }
