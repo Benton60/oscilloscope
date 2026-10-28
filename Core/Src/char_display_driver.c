@@ -6,6 +6,8 @@
  */
 
 #include "char_display_driver.h"
+#include "main.h"
+#include "app_freertos.h"
 
 void draw_char_screen()
 {
@@ -19,5 +21,36 @@ void init_char_display()
 
 void command(char i)
 {
-	return;
+	GPIOB -> ODR = (GPIOB -> ODR & ~0xFF) | i;
+	GPIOB -> ODR &= ~(1<<8);
+	GPIOB -> ODR &= ~(1<<9);
+	GPIOB -> ODR |= (1<<10);
+	osDelay(1);
+	GPIOB -> ODR &= ~(1<<10);
+}
+
+void write(char i)
+{
+	GPIOB -> ODR = (GPIOB -> ODR & ~0xFF) | i;
+	GPIOB -> ODR |= (1<<8);
+	GPIOB -> ODR &= ~(1<<9);
+	GPIOB -> ODR |= (1<<10);
+	osDelay(1);
+	GPIOB -> ODR &= ~(1<<10);
+}
+
+void init()
+{
+	GPIOB -> ODR &= ~(1<<10);
+	osDelay(100);
+	command(0x30);
+	osDelay(30);
+	command(0x30);
+	osDelay(10);
+	command(0x30);
+	osDelay(10);
+	command(0x38);
+	command(0x10);
+	command(0x0c);
+	command(0x06);
 }

@@ -19,11 +19,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_freertos.h"
-#include "spi_display_driver.h"
-#include <stdint.h>
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "char_display_driver.h"
+#include "spi_display_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -118,12 +118,13 @@ void MX_FREERTOS_Init(void) {
 * @retval None
 */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument) {
-    /* USER CODE BEGIN defaultTask */
+void StartDefaultTask(void *argument)
+{
+  /* USER CODE BEGIN defaultTask */
     init_spi_screen();
     clear_screen();
     for(;;);
-    /* USER CODE END defaultTask */
+  /* USER CODE END defaultTask */
 }
 
 /* USER CODE BEGIN Header_StartTask02 */
@@ -136,6 +137,8 @@ void StartDefaultTask(void *argument) {
 void StartTask02(void *argument)
 {
   /* USER CODE BEGIN char_diplay */
+	init();
+	write('H');
   /* Infinite loop */
   for(;;)
   {
