@@ -10,4 +10,7 @@ Buttons : PA5 & PA6 for Trigger Level
 
 SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select, PC8 for Data/Command, PC9 as reset
 
-Character Display : Any/All PB pins
+Character Display : 	pB0 through pB7 - DB0 through DB7
+			pB8 - RS
+			pB9 - R/W
+			pB10 - E
