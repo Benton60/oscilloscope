@@ -6,7 +6,9 @@ Time Dial Driver
 #ifndef TIME_DIAL_DRIVER_H_   
 #define TIME_DIAL_DRIVER_H_
 
-void read_time_dial(); 
-void get_time_scale();
+#include "main.h"
+
+int8_t read_time_dial();
+int16_t set_time_scale(int8_t up_or_down);
 
 #endif 

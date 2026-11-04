@@ -25,6 +25,7 @@
 #include "char_display_driver.h"
 #include "spi_display_driver.h"
 #include "voltage_data_points_holder.h"
+#include "amplitude_dial_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -124,8 +125,7 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN defaultTask */
 
 	//This code starts the DMA ADC conversions IT SHOULD NOT BE REMOVED EVER
-	uint16_t adcBuffer[256] = {0};
-	ADC_Start_DMA(adcBuffer);
+	//ADC_Start_DMA(get_adcBuffer());
 	//
 
 
@@ -134,9 +134,7 @@ void StartDefaultTask(void *argument)
     clear_screen();
     for(;;)
     {
-        uint32_t remaining = LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_1);
-    	int i = 0; //I needed a line of code for a break point while debugging
-
+    	osDelay(1000);
     }
   /* USER CODE END defaultTask */
 }
@@ -152,7 +150,7 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN char_diplay */
 	init();
-	write(0x7E);
+	/*write(0x7E);
 	write('C');
 	write('O');
 	write('O');
@@ -165,12 +163,19 @@ void StartTask02(void *argument)
 	write('L');
 	write('A');
 	write('Y');
-	write(0x7F);
-	write(0x10);
+	write(0x7F);*/
   /* Infinite loop */
+	int16_t ampstate;
   for(;;)
   {
-    osDelay(1);
+    osDelay(5000);
+    ampstate = set_amplitude_scale(read_amplitude_dial());
+    for(int i = 4; i > 0; i--)
+    {
+    	char amp_write_state = '0' + (ampstate % 10);
+    	write(amp_write_state);
+    	ampstate = ampstate / 10;
+    }
   }
   /* USER CODE END char_diplay */
 }

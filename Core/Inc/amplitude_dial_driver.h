@@ -12,7 +12,9 @@ Amplitude Dial Driver
 #ifndef SRC_AMPLITUDE_DIAL_DRIVER_H_
 #define SRC_AMPLITUDE_DIAL_DRIVER_H_
 
-void read_amplitude_dial();
-void get_amplitude_scale();
+#include "main.h"
+
+int8_t read_amplitude_dial();
+int16_t set_amplitude_scale(int8_t up_or_down);
 
 #endif /* SRC_AMPLITUDE_DIAL_DRIVER_H_ */
