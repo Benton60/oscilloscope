@@ -7,12 +7,23 @@
 #include "main.h"
 #include "spi_display_driver.h"
 #include "app_freertos.h"
-void draw_SPI_screen()
-{
-	return; /*TODO*/
+
+uint8_t screen_buffer [SCREEN_COLUMNS * 8];
+
+void * draw_SPI_screen() {
+    for(int i = 0; i < 8; i++) {
+        set_page(i);
+        set_column(0x00);
+
+        for(int j = 0; j < SCREEN_COLUMNS; j++) {
+            send_byte(screen_buffer[i * SCREEN_COLUMNS + j]);
+        }
+    }
+
+    return screen_buffer;
 }
 
-void init_spi_screen(){
+void * init_spi_screen(){
     //SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select, PC8 for Data/Command, PC9 for Reset
     LL_SPI_Enable(SPI1);
     
@@ -25,14 +36,19 @@ void init_spi_screen(){
     for(int i = 0; i < 13; i++){
         send_command(init[i]);
     }
- 
+    return screen_buffer;
+}
+
+
+void * get_screen_buffer() {
+    return screen_buffer;
 }
 
 void clear_screen() {
     for(int j = 0; j < 8; j++){
         set_page(j);
         set_column(0x00);
-        for(int i = 0; i < 120; i++) {
+        for(int i = 0; i < SCREEN_COLUMNS; i++) {
             send_byte(0x00);
         }
     }
@@ -43,8 +59,8 @@ void set_page(uint8_t page) {
 }
 
 void set_column(uint8_t column) {
-    send_command(column | 0xf0);
-    send_command((column>>4) | 0x1f);
+    send_command(0x00 | (column & 0x0F));
+    send_command(0x10 | ((column >> 4) & 0x0F));
 }
 
 void send_command(uint8_t command) {

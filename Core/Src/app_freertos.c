@@ -126,16 +126,20 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN defaultTask */
 
 	//This code starts the DMA ADC conversions IT SHOULD NOT BE REMOVED EVER
-	//ADC_Start_DMA(get_adcBuffer());
+    uint16_t * adcBuffer = get_adcBuffer();
+	ADC_Start_DMA(adcBuffer);
 	//
 
 
 
-	init_spi_screen();
+	uint8_t *screen_buffer = init_spi_screen();
     clear_screen();
-    for(;;)
-    {
-    	osDelay(1000);
+    for(;;){
+        if(adc_buffer_ready) {
+            adc_buffer_ready = 0;
+            transfer_adc_buffer_to_screen_buffer(adcBuffer, screen_buffer);
+            draw_SPI_screen();
+        }
     }
   /* USER CODE END defaultTask */
 }

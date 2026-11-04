@@ -10,7 +10,9 @@ Voltage Data Points Holder
 #ifndef VOLTAGE_DATA_POINTS_HOLDER_H_ 
 #define VOLTAGE_DATA_POINTS_HOLDER_H_
 
+void * get_adcBuffer();
 void ADC_Start_DMA(void *);
 void holder_voltage_points();
+void transfer_adc_buffer_to_screen_buffer(void * adcBuffer, void * screen_buffer);
 
 #endif
