@@ -65,7 +65,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+extern volatile int adc_buffer_ready;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

@@ -41,6 +41,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+volatile int adc_buffer_ready = 0;
 
 /* USER CODE END PV */
 
@@ -107,7 +108,23 @@ void HardFault_Handler(void)
 void DMA1_Channel1_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+/**
+ * @brief DMA1 Channel 1 interrupt handler.
+ */
+    if (LL_DMA_IsActiveFlag_TC1(DMA1))
+    {
+        // Clear transfer complete flag
+        LL_DMA_ClearFlag_TC1(DMA1);
 
+        // Tell the application that the ADC buffer is ready
+        adc_buffer_ready = 1;
+    }
+
+    if (LL_DMA_IsActiveFlag_TE1(DMA1))
+    {
+        // Clear transfer error flag
+        LL_DMA_ClearFlag_TE1(DMA1);
+    }
   /* USER CODE END DMA1_Channel1_IRQn 0 */
   /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
 
