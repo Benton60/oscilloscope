@@ -4,7 +4,7 @@ Ethan Watkins
 
 ADC1_IN0 : PC0
 
-Encoder : PC1 & PC2 for Time, PC3 & PC4 for Amplitude
+Encoder : PB12 & PB13 for Time, PB14 & PB15 for Amplitude
 
 Buttons : PA5 & PA6 for Trigger Level
 
