@@ -29,6 +29,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32u0xx_hal.h"
 #include "stm32u0xx_ll_adc.h"
+#include "stm32u0xx_ll_dma.h"
 #include "stm32u0xx_ll_pwr.h"
 #include "stm32u0xx_ll_crs.h"
 #include "stm32u0xx_ll_rcc.h"
@@ -37,7 +38,6 @@ extern "C" {
 #include "stm32u0xx_ll_exti.h"
 #include "stm32u0xx_ll_cortex.h"
 #include "stm32u0xx_ll_utils.h"
-#include "stm32u0xx_ll_dma.h"
 #include "stm32u0xx_ll_spi.h"
 #include "stm32u0xx_ll_gpio.h"
 
@@ -77,6 +77,8 @@ void Error_Handler(void);
 #define OSC_IN_GPIO_Port GPIOF
 #define OSC_OUT_Pin LL_GPIO_PIN_1
 #define OSC_OUT_GPIO_Port GPIOF
+#define ADC1_Pin LL_GPIO_PIN_0
+#define ADC1_GPIO_Port GPIOC
 #define USART2_TX_Pin LL_GPIO_PIN_2
 #define USART2_TX_GPIO_Port GPIOA
 #define USART2_RX_Pin LL_GPIO_PIN_3

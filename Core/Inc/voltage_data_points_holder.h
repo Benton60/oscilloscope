@@ -1,3 +1,4 @@
+
 /*
 Voltage Data Points Holder
     queue for the incoming voltages triggered by the interrupt  -> input
@@ -9,7 +10,7 @@ Voltage Data Points Holder
 #ifndef VOLTAGE_DATA_POINTS_HOLDER_H_ 
 #define VOLTAGE_DATA_POINTS_HOLDER_H_
 
-void read_adc_voltage();
+void ADC_Start_DMA(void *);
 void holder_voltage_points();
 
 #endif

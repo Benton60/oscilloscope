@@ -47,7 +47,7 @@ extern "C" {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define ADC_BUFFER_SIZE 256
 /* USER CODE END PD */
 
 /* Exported macro -------------------------------------------------------------*/

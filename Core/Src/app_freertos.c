@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "char_display_driver.h"
 #include "spi_display_driver.h"
+#include "voltage_data_points_holder.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -121,11 +122,21 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN defaultTask */
-    init_spi_screen();
+
+	//This code starts the DMA ADC conversions IT SHOULD NOT BE REMOVED EVER
+	uint16_t adcBuffer[256] = {0};
+	ADC_Start_DMA(adcBuffer);
+	//
+
+
+
+	init_spi_screen();
     clear_screen();
     for(;;)
     {
-    	osDelay(10000);
+        uint32_t remaining = LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_1);
+    	int i = 0; //I needed a line of code for a break point while debugging
+
     }
   /* USER CODE END defaultTask */
 }
