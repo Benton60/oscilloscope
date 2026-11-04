@@ -12,31 +12,26 @@ uint8_t a1;
 uint8_t a2;
 int16_t amplitude_state = 1100;
 
-int8_t read_amplitude_dial()
+int8_t read_amplitude_dial(void)
 {
-	uint16_t a1_cur = GPIOC -> IDR & 1;
-	uint16_t a2_cur = (GPIOC -> IDR >> 0) & 1;
-	if(a1_cur == 0 && a1 == 1)
-	{
-		a1 = 0;
-		if(a2_cur==1)
-		{
-			return 1;
-		}
-		else
-		{
-			return -1;
-		}
-		return 1;
-	}
-	a1 = a1_cur;
-	a2 = a2_cur;
-	return 0;
+    static uint8_t state = 0;
+    static const int8_t table[16] = {
+         0, -1,  1,  0,
+         1,  0,  0, -1,
+        -1,  0,  0,  1,
+         0,  1, -1,  0
+    };
+
+    uint8_t a = (GPIOB->IDR >> 14) & 1;
+    uint8_t b = (GPIOB->IDR >> 15) & 1;
+
+    state = ((state << 2) | (a << 1) | b) & 0x0F;
+    return table[state];
 }
 
 int16_t set_amplitude_scale(int8_t up_or_down)
 {
-	if(up_or_down==-1)
+	if(up_or_down<0)
 	{
 		if(amplitude_state==0)
 		{
@@ -44,7 +39,7 @@ int16_t set_amplitude_scale(int8_t up_or_down)
 		}
 		amplitude_state-=100;
 	}
-	if(up_or_down==1)
+		if(up_or_down>0)
 	{
 		if(amplitude_state==3300)
 		{

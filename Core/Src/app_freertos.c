@@ -26,6 +26,7 @@
 #include "spi_display_driver.h"
 #include "voltage_data_points_holder.h"
 #include "amplitude_dial_driver.h"
+#include "time_dial_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -165,10 +166,13 @@ void StartTask02(void *argument)
 	write('Y');
 	write(0x7F);*/
   /* Infinite loop */
-	int16_t ampstate;
+	int16_t ampstate = 1100;
+	int32_t timestate = 100000;
   for(;;)
   {
-    osDelay(5000);
+	osDelay(20);
+	command(0x01);
+	osDelay(2);
     ampstate = set_amplitude_scale(read_amplitude_dial());
     for(int i = 4; i > 0; i--)
     {
@@ -176,6 +180,15 @@ void StartTask02(void *argument)
     	write(amp_write_state);
     	ampstate = ampstate / 10;
     }
+    write(0x10);
+    timestate = set_time_scale(read_time_dial());
+    for(int i = 6; i > 0; i--)
+    {
+    	char time_write_state = '0' + (timestate % 10);
+    	write(time_write_state);
+    	timestate = timestate / 10;
+    }
+
   }
   /* USER CODE END char_diplay */
 }
