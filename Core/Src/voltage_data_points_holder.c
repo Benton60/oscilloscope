@@ -11,9 +11,7 @@ void ADC_Start_DMA(void * adcBuffer) {
     LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_1);
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_1);
 
-    while (!LL_ADC_IsActiveFlag_ADRDY(ADC1))
-    {
-    }
+    while (!LL_ADC_IsActiveFlag_ADRDY(ADC1)){}
 
     LL_DMA_ConfigAddresses(
         DMA1,
