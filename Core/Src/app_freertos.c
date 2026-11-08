@@ -135,6 +135,7 @@ void StartDefaultTask(void *argument)
 	uint8_t *screen_buffer = init_spi_screen();
     clear_screen();
     for(;;){
+    	osDelay(1000000);
         if(adc_buffer_ready) {
             adc_buffer_ready = 0;
             transfer_adc_buffer_to_screen_buffer(adcBuffer, screen_buffer);
@@ -172,27 +173,39 @@ void StartTask02(void *argument)
   /* Infinite loop */
 	int16_t ampstate = 1100;
 	int32_t timestate = 100000;
+	char numlist1[4] = {'0', '0', '0', '0'};
+	char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
   for(;;)
   {
-	osDelay(20);
+	osDelay(50);
 	command(0x01);
 	osDelay(2);
     ampstate = set_amplitude_scale(read_amplitude_dial());
     for(int i = 4; i > 0; i--)
     {
-    	char amp_write_state = '0' + (ampstate % 10);
-    	write(amp_write_state);
+    	numlist1[i] = '0' + (ampstate % 10);
     	ampstate = ampstate / 10;
     }
+    for(int i = 1; i < 5; i++)
+    {
+    	write(numlist1[i]);
+    }
+    write('m');
+    write('V');
+    write(0x10);
     write(0x10);
     timestate = set_time_scale(read_time_dial());
     for(int i = 6; i > 0; i--)
     {
-    	char time_write_state = '0' + (timestate % 10);
-    	write(time_write_state);
+    	numlist2[i] = '0' + (timestate % 10);
     	timestate = timestate / 10;
     }
-
+    for(int i = 1; i < 7; i++)
+        {
+        	write(numlist2[i]);
+        }
+    write(0xE4);
+    write('S');
   }
   /* USER CODE END char_diplay */
 }

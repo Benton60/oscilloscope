@@ -26,12 +26,12 @@ int32_t set_time_scale(int8_t up_or_down)
 {
 	if(up_or_down==-1)
 		{
-			if(time_state<=100) time_state=200;
+			if(time_state<=200) time_state=200;
 			time_state = time_state / 2;
 		}
 	if(up_or_down==1)
 		{
-			if(time_state>=100000) time_state=50000;
+			if(time_state>=50000) time_state=50000;
 			time_state = time_state * 2;
 		}
 		return time_state;
