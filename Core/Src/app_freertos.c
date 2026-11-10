@@ -32,6 +32,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 typedef StaticTask_t osStaticThreadDef_t;
+typedef StaticSemaphore_t osStaticMutexDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -69,6 +70,14 @@ const osThreadAttr_t char_diplay_attributes = {
   .cb_size = sizeof(MycontrolBlocTask02),
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for UserInputScale */
+osMutexId_t UserInputScaleHandle;
+osStaticMutexDef_t UserInputScaleControlBlock01;
+const osMutexAttr_t UserInputScale_attributes = {
+  .name = "UserInputScale",
+  .cb_mem = &UserInputScaleControlBlock01,
+  .cb_size = sizeof(UserInputScaleControlBlock01),
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -84,6 +93,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
+  /* creation of UserInputScale */
+  UserInputScaleHandle = osMutexNew(&UserInputScale_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -213,3 +224,4 @@ void StartTask02(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
+
