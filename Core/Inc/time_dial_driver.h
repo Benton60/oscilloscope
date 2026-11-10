@@ -8,7 +8,7 @@ Time Dial Driver
 
 #include "main.h"
 
-int8_t read_time_dial();
-int32_t set_time_scale(int8_t up_or_down);
+void read_time_dial();
+int32_t get_time_scale();
 
 #endif 
