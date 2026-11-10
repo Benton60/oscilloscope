@@ -3,10 +3,6 @@
 #include "spi_display_driver.h"
 #include "main.h"
 
-
-void set_adc_clock_prescalar(uint16_t * horizontal_scale_state);
-
-
 void ADC_Start_DMA(void * adcBuffer) {
     LL_ADC_Enable(ADC1);
     LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_1);
@@ -33,13 +29,13 @@ void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_b
     uint16_t * adcBuffer = adcBuffer_null;
     uint8_t * screen_buffer = screen_buffer_null;
     uint16_t vertical_scale = 3500;             // 100 - 3300
-    uint16_t horizontal_scale_state = 100;       // 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
+    uint16_t horizontal_scale_state = 1000;     // 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
     uint16_t trigger_level  = 1000;             // 0 - 3300
     uint16_t trigger_direction = 1;             // 1 - up, 0 - down
 
 
     // Only 120 pixels can be shown on the screen at once...
-    // my adc DMA buffer can hold 256...
+    // my ADC DMA buffer can hold 256...
     // the extra DMA space is so that the trigger can "shift"...
     // where from the DMA buffer the data is being pulled from.
     int trigger_offset = 0;
@@ -63,25 +59,30 @@ void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_b
             }
         }
     }
-    set_adc_clock_prescalar(&horizontal_scale_state); //changes the pre-scalar based on horizontal_scale 
+    set_adc_clock_prescalar(horizontal_scale_state); //changes the pre-scalar based on horizontal_scale 
     LL_ADC_REG_StartConversion(ADC1);
 }
 
-void set_adc_clock_prescalar(uint16_t * horizontal_scale_state) {
-    switch (*horizontal_scale_state) {
+void set_adc_clock_prescalar(uint16_t horizontal_scale_state) {
+    //the first five horizontal scales are controlled via ADC pre-scalar aka MODE 1, where-as everything after 1000 u.s. or pre-scalar 10 must be done in software aka MODE 2
+    switch (horizontal_scale_state) {
         case 1:
+            LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV1);
             break;
         case 2: 
+            LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV2);
             break;
         case 3:
+            LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV4);
             break;
         case 4: 
+            LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV6);
             break;
         case 5:
-            break;
-        case 6: 
+            LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV8);
             break;
         default:
+            LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV10);
             break;
     }
 }

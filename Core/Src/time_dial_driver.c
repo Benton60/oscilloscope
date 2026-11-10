@@ -26,7 +26,6 @@ void read_time_dial(int * time_state){
     //return table[state];
 }
 
-//LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV10);
 int get_time_scale(int time_state) {
     // the slowest pre-scalar available, 10, corresponds to 1 period of a 1kHz wave or 1000 u.s.
     // the other values stored in the table are calculated based on this value. 
