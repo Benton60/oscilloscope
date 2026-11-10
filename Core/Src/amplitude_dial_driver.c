@@ -8,12 +8,9 @@
 #include "amplitude_dial_driver.h"
 #include "main.h"
 
-uint8_t a1;
-uint8_t a2;
-int16_t amplitude_state = 1100;
+int16_t amplitude_state = 3300;
 
-int8_t read_amplitude_dial(void)
-{
+int8_t read_amplitude_dial() {
     static uint8_t state = 0;
     static const int8_t table[16] = {
          0, -1,  1,  0,
@@ -29,20 +26,15 @@ int8_t read_amplitude_dial(void)
     return table[state];
 }
 
-int16_t set_amplitude_scale(int8_t up_or_down)
-{
-	if(up_or_down<0)
-	{
-		if(amplitude_state==100)
-		{
+int16_t set_amplitude_scale(int8_t up_or_down) {
+	if(up_or_down<0) {
+		if(amplitude_state==100) {
 			amplitude_state=200;
 		}
 		amplitude_state-=100;
 	}
-		if(up_or_down>0)
-	{
-		if(amplitude_state==3300)
-		{
+	if(up_or_down>0) {
+		if(amplitude_state==3300) {
 			amplitude_state=3200;
 		}
 		amplitude_state+=100;

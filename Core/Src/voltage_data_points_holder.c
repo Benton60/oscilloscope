@@ -28,10 +28,12 @@ void ADC_Start_DMA(void * adcBuffer) {
 void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_buffer_null) {
     uint16_t * adcBuffer = adcBuffer_null;
     uint8_t * screen_buffer = screen_buffer_null;
-    uint16_t vertical_scale = 3500;             // 100 - 3300
-    uint16_t horizontal_scale_state = 1000;     // 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
-    uint16_t trigger_level  = 1000;             // 0 - 3300
-    uint16_t trigger_direction = 1;             // 1 - up, 0 - down
+    osMutexAcquire(UserInputScaleHandle, osWaitForever);
+    uint16_t vertical_scale = protected_vertical_scale_state;             	// 100 - 3300
+    uint16_t horizontal_scale_state = protected_horizontal_scale_state;     // 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
+    uint16_t trigger_level  = protected_trigger_height;             		// 0 - 3300
+    uint16_t trigger_direction = protected_trigger_state;             		// 1 - up, 0 - down
+    osMutexRelease(UserInputScaleHandle);
 
 
     // Only 120 pixels can be shown on the screen at once...
