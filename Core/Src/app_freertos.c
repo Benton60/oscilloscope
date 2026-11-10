@@ -27,6 +27,7 @@
 #include "voltage_data_points_holder.h"
 #include "amplitude_dial_driver.h"
 #include "time_dial_driver.h"
+#include "stdlib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,7 +127,8 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN defaultTask */
 
 	//This code starts the DMA ADC conversions IT SHOULD NOT BE REMOVED EVER
-    uint16_t * adcBuffer = get_adcBuffer();
+    uint16_t * adcBuffer = (uint16_t *) malloc(256 * sizeof(uint16_t)); //I'm using dynamic allocation because the stack size is only 512 bytes so this buffer fills
+                                                                        //the stack by itself. Plus, this is during initialization so it doesn't break any commandments.
 	ADC_Start_DMA(adcBuffer);
 	//
 
@@ -172,7 +174,7 @@ void StartTask02(void *argument)
 	write(0x7F);*/
   /* Infinite loop */
 	int16_t ampstate = 0;
-	int32_t timestate = 0;
+	int timestate = 0;
 	char numlist1[4] = {'0', '0', '0', '0'};
 	char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
   for(;;)
@@ -192,11 +194,11 @@ void StartTask02(void *argument)
     write('V');
     write(0x10);
     write(0x10);
-    read_time_dial();
-    timestate = get_time_scale();
+    read_time_dial(&timestate);
+    int time_value = get_time_scale();
     for(int i = 6; i > 0; i--) {
-    	numlist2[i] = '0' + (timestate % 10);
-    	timestate = timestate / 10;
+    	numlist2[i] = '0' + (time_value % 10);
+    	time_value = time_value / 10;
     }
     for(int i = 1; i < 7; i++) {
         write(numlist2[i]);
