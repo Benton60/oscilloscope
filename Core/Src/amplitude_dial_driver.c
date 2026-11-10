@@ -33,9 +33,9 @@ int16_t set_amplitude_scale(int8_t up_or_down)
 {
 	if(up_or_down<0)
 	{
-		if(amplitude_state==0)
+		if(amplitude_state==100)
 		{
-			amplitude_state=100;
+			amplitude_state=200;
 		}
 		amplitude_state-=100;
 	}
