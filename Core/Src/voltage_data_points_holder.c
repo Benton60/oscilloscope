@@ -4,7 +4,8 @@
 #include "main.h"
 
 
-uint16_t adcBuffer[256];
+void set_adc_clock_prescalar(uint16_t * horizontal_scale_state);
+
 
 void ADC_Start_DMA(void * adcBuffer) {
     LL_ADC_Enable(ADC1);
@@ -28,20 +29,13 @@ void ADC_Start_DMA(void * adcBuffer) {
     LL_ADC_REG_StartConversion(ADC1);
 }
 
-void holder_voltage_points() {
-    return; //TODO
-}
-void * get_adcBuffer() {
-    return adcBuffer;
-}
-
 void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_buffer_null) {
     uint16_t * adcBuffer = adcBuffer_null;
     uint8_t * screen_buffer = screen_buffer_null;
-    uint16_t vertical_scale = 3500;     // 100 - 3300
-    uint16_t horzontal_scale = 100;     // 100 - 100000
-    uint16_t trigger_level  = 1000;     // 0 - 3300
-    uint16_t trigger_direction = 1;     // 1 - up, 0 - down
+    uint16_t vertical_scale = 3500;             // 100 - 3300
+    uint16_t horizontal_scale_state = 100;       // 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
+    uint16_t trigger_level  = 1000;             // 0 - 3300
+    uint16_t trigger_direction = 1;             // 1 - up, 0 - down
 
 
     // Only 120 pixels can be shown on the screen at once...
@@ -49,14 +43,16 @@ void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_b
     // the extra DMA space is so that the trigger can "shift"...
     // where from the DMA buffer the data is being pulled from.
     int trigger_offset = 0;
-    for(int i = 0; i < 145; i++){
-        if(adcBuffer[i] <= trigger_level && adcBuffer[i+1] > trigger_level){
+    for(int i = 0; i < 145; i++){   // will time out and just draw the screen if no trigger is detected
+        if((adcBuffer[i] <= trigger_level && adcBuffer[i+1] > trigger_level) && trigger_direction){             //checks smaller than, bigger than, rising
+            break;
+        } else if((adcBuffer[i] >= trigger_level && adcBuffer[i+1] < trigger_level) && ~trigger_direction) {    //checks bigger than, smaller than, falling
             break;
         }
         trigger_offset++;
     }
     for(int i = trigger_offset; i < SCREEN_COLUMNS + trigger_offset; i++) {
-        int pixels_up = adcBuffer[i * horzontal_scale / 100] * SCREEN_ROWS / 4096 * 3300 / vertical_scale;
+        int pixels_up = adcBuffer[i] * SCREEN_ROWS / 4096 * 3300 / vertical_scale;
         int page = pixels_up / 8;
         int pixels_up_per_page = pixels_up % 8;
         for(int j = 0; j < 8; j++) {
@@ -67,6 +63,26 @@ void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_b
             }
         }
     }
+    set_adc_clock_prescalar(&horizontal_scale_state); //changes the pre-scalar based on horizontal_scale 
     LL_ADC_REG_StartConversion(ADC1);
+}
+
+void set_adc_clock_prescalar(uint16_t * horizontal_scale_state) {
+    switch (*horizontal_scale_state) {
+        case 1:
+            break;
+        case 2: 
+            break;
+        case 3:
+            break;
+        case 4: 
+            break;
+        case 5:
+            break;
+        case 6: 
+            break;
+        default:
+            break;
+    }
 }
 
