@@ -33,7 +33,6 @@ int get_time_scale(int time_state) {
     int lookup_table[11] = {100, 200, 400, 600, 800, 1000, 2000, 4000, 6000, 8000, 10000};
     //these values are in micro seconds aka u.s.
     return lookup_table[time_state];
-    
 }	
 
 

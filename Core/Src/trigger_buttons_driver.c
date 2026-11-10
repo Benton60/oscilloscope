@@ -5,7 +5,7 @@
  *      Author: ethanwatkins
  */
 
-#include "trigger_dial_driver.h"
+#include <trigger_buttons_driver.h>
 
 void read_trigger_buttons()
 {

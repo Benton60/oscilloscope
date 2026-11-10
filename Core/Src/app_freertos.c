@@ -27,7 +27,7 @@
 #include "voltage_data_points_holder.h"
 #include "amplitude_dial_driver.h"
 #include "time_dial_driver.h"
-#include "stdlib.h"
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,6 +49,12 @@ typedef StaticSemaphore_t osStaticMutexDef_t;
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+
+//All these variables are protected under the UserInputScale mnviutex
+uint16_t protected_vertical_scale_state = 3300;	    // vertical scale defaults to 3.3
+int protected_horizontal_scale_state = 1000;		//horizontal scale defaults to 1000
+uint8_t protected_trigger_state = 1;				//trigger defaults to rising
+uint16_t protected_trigger_height = 1500; 			//trigger defaults to 2v
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -169,36 +175,24 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN char_diplay */
 	init();
-	/*write(0x7E);
-	write('C');
-	write('O');
-	write('O');
-	write('L');
-	write(0x10);
-	write('D');
-	write('I');
-	write('S');
-	write('P');
-	write('L');
-	write('A');
-	write('Y');
-	write(0x7F);*/
   /* Infinite loop */
 	int16_t ampstate = 0;
 	int timestate = 0;
 	char numlist1[4] = {'0', '0', '0', '0'};
 	char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
-  for(;;)
-  {
-	osDelay(50000);
+  for(;;) {
+	osDelay(25);
 	command(0x01);
 	osDelay(2);
     ampstate = set_amplitude_scale(read_amplitude_dial());
-    for(int i = 4; i > 0; i--) {
+    osMutexAcquire(UserInputScaleHandle, osWaitForever);
+    	protected_vertical_scale_state = ampstate;
+    osMutexRelease(UserInputScaleHandle);
+    for(int i = 3; i >= 0; i--) {
     	numlist1[i] = '0' + (ampstate % 10);
     	ampstate = ampstate / 10;
     }
-    for(int i = 1; i < 5; i++) {
+    for(int i = 0; i < 4; i++) {
     	write(numlist1[i]);
     }
     write('m');
@@ -206,12 +200,15 @@ void StartTask02(void *argument)
     write(0x10);
     write(0x10);
     read_time_dial(&timestate);
-    int time_value = get_time_scale();
-    for(int i = 6; i > 0; i--) {
+    osMutexAcquire(UserInputScaleHandle, osWaitForever);
+    	protected_horizontal_scale_state = timestate;
+    osMutexRelease(UserInputScaleHandle);
+    int time_value = get_time_scale(timestate);
+    for(int i = 5; i >= 0; i--) {
     	numlist2[i] = '0' + (time_value % 10);
     	time_value = time_value / 10;
     }
-    for(int i = 1; i < 7; i++) {
+    for(int i = 0; i < 6; i++) {
         write(numlist2[i]);
     }
     write(0xE4);
