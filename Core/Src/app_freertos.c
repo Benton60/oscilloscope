@@ -27,6 +27,7 @@
 #include "voltage_data_points_holder.h"
 #include "amplitude_dial_driver.h"
 #include "time_dial_driver.h"
+#include <stdint.h>
 #include <stdlib.h>
 /* USER CODE END Includes */
 
@@ -152,12 +153,19 @@ void StartDefaultTask(void *argument)
 
 
 	uint8_t *screen_buffer = init_spi_screen();
+    uint16_t horizontal_current_state = 5;
     clear_screen();
     for(;;){
     	osDelay(10);
         if(adc_buffer_ready) {
             adc_buffer_ready = 0;
-            transfer_adc_buffer_to_screen_buffer(adcBuffer, screen_buffer);
+            if(horizontal_current_state > 5) { //states above five need to use an intermediate buffer
+                uint16_t adcMode2Buffer[256];
+                fill_mode2_buffer(&horizontal_current_state, adcBuffer, adcMode2Buffer); 
+                transfer_adc_buffer_to_screen_buffer(&horizontal_current_state, adcMode2Buffer, screen_buffer);
+            } else { //we can just pass the unmodified adcBuffer to be transferred to the screen buffer for states 0-5
+                transfer_adc_buffer_to_screen_buffer(&horizontal_current_state, adcBuffer, screen_buffer);
+            }
             draw_SPI_screen();
         }
     }
@@ -181,7 +189,7 @@ void StartTask02(void *argument)
 	char numlist1[4] = {'0', '0', '0', '0'};
 	char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
   for(;;) {
-	osDelay(25);
+	osDelay(15);
 	command(0x01);
 	osDelay(2);
     ampstate = set_amplitude_scale(read_amplitude_dial());

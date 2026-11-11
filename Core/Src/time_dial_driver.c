@@ -3,7 +3,7 @@
 #include "main.h"
 
 void read_time_dial(int * time_state){
-    uint8_t state = 0;
+    static uint8_t state = 0;
     static const int8_t table[16] = {
          0, -1,  1,  0,
          1,  0,  0, -1,
@@ -30,7 +30,7 @@ int get_time_scale(int time_state) {
     // the slowest pre-scalar available, 10, corresponds to 1 period of a 1kHz wave or 1000 u.s.
     // the other values stored in the table are calculated based on this value. 
     // these values should be changed b4 presentation to exactly match the true frequencies they display TODO
-    int lookup_table[11] = {100, 200, 400, 600, 800, 1000, 2000, 4000, 6000, 8000, 10000};
+    int lookup_table[11] = {100, 200, 400, 600, 800, 1000, 5000, 10000, 25000, 50000, 100000};
     //these values are in micro seconds aka u.s.
     return lookup_table[time_state];
 }	
