@@ -20,8 +20,8 @@ void read_time_dial(int * time_state){
                                 //As such a "lookup table" will be used to get the value we display to the screen instead of storing the value as the "state".
     if(*time_state == -1) {
         *time_state = 0;        //can't let the state drop below zero obv.
-    } else if(*time_state == 11) {
-        *time_state = 10;
+    } else if(*time_state == 9) {
+        *time_state = 8;
     }
     //return table[state];
 }
@@ -30,9 +30,10 @@ int get_time_scale(int time_state) {
     // the slowest pre-scalar available, 10, corresponds to 1 period of a 1kHz wave or 1000 u.s.
     // the other values stored in the table are calculated based on this value. 
     // these values should be changed b4 presentation to exactly match the true frequencies they display TODO
-    int lookup_table[11] = {100, 200, 400, 600, 800, 1000, 5000, 10000, 25000, 50000, 100000};
+    int lookup_table[9] = {100, 200, 400, 600, 800, 1000, 25000, 50000, 100000};
     //these values are in micro seconds aka u.s.
     return lookup_table[time_state];
-}	
+}
+
 
 
