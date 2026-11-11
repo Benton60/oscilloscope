@@ -37,7 +37,10 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern uint16_t protected_vertical_scale_state;
+extern int protected_horizontal_scale_state;
+extern uint8_t protected_trigger_state;
+extern uint16_t protected_trigger_height;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -56,6 +59,7 @@ extern "C" {
 /* USER CODE END EM */
 extern osThreadId_t defaultTaskHandle;
 extern osThreadId_t char_diplayHandle;
+extern osMutexId_t UserInputScaleHandle;
 
 /* Exported function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */

@@ -1,4 +1,4 @@
-
+#include "main.h"
 /*
 Voltage Data Points Holder
     queue for the incoming voltages triggered by the interrupt  -> input
@@ -10,9 +10,8 @@ Voltage Data Points Holder
 #ifndef VOLTAGE_DATA_POINTS_HOLDER_H_ 
 #define VOLTAGE_DATA_POINTS_HOLDER_H_
 
-void * get_adcBuffer();
+void set_adc_clock_prescalar(uint16_t horizontal_scale_state);
 void ADC_Start_DMA(void *);
-void holder_voltage_points();
 void transfer_adc_buffer_to_screen_buffer(void * adcBuffer, void * screen_buffer);
 
 #endif

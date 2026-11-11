@@ -27,10 +27,12 @@
 #include "voltage_data_points_holder.h"
 #include "amplitude_dial_driver.h"
 #include "time_dial_driver.h"
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 typedef StaticTask_t osStaticThreadDef_t;
+typedef StaticSemaphore_t osStaticMutexDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -47,6 +49,12 @@ typedef StaticTask_t osStaticThreadDef_t;
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+
+//All these variables are protected under the UserInputScale mnviutex
+uint16_t protected_vertical_scale_state = 3300;	    // vertical scale defaults to 3.3
+int protected_horizontal_scale_state = 1000;		//horizontal scale defaults to 1000
+uint8_t protected_trigger_state = 1;				//trigger defaults to rising
+uint16_t protected_trigger_height = 1500; 			//trigger defaults to 2v
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -68,6 +76,14 @@ const osThreadAttr_t char_diplay_attributes = {
   .cb_size = sizeof(MycontrolBlocTask02),
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for UserInputScale */
+osMutexId_t UserInputScaleHandle;
+osStaticMutexDef_t UserInputScaleControlBlock01;
+const osMutexAttr_t UserInputScale_attributes = {
+  .name = "UserInputScale",
+  .cb_mem = &UserInputScaleControlBlock01,
+  .cb_size = sizeof(UserInputScaleControlBlock01),
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -83,6 +99,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
+  /* creation of UserInputScale */
+  UserInputScaleHandle = osMutexNew(&UserInputScale_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -126,7 +144,8 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN defaultTask */
 
 	//This code starts the DMA ADC conversions IT SHOULD NOT BE REMOVED EVER
-    uint16_t * adcBuffer = get_adcBuffer();
+    uint16_t * adcBuffer = (uint16_t *) malloc(256 * sizeof(uint16_t)); //I'm using dynamic allocation because the stack size is only 512 bytes so this buffer fills
+                                                                        //the stack by itself. Plus, this is during initialization so it doesn't break any commandments.
 	ADC_Start_DMA(adcBuffer);
 	//
 
@@ -135,7 +154,7 @@ void StartDefaultTask(void *argument)
 	uint8_t *screen_buffer = init_spi_screen();
     clear_screen();
     for(;;){
-    	osDelay(1000000);
+    	osDelay(10);
         if(adc_buffer_ready) {
             adc_buffer_ready = 0;
             transfer_adc_buffer_to_screen_buffer(adcBuffer, screen_buffer);
@@ -156,54 +175,42 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN char_diplay */
 	init();
-	/*write(0x7E);
-	write('C');
-	write('O');
-	write('O');
-	write('L');
-	write(0x10);
-	write('D');
-	write('I');
-	write('S');
-	write('P');
-	write('L');
-	write('A');
-	write('Y');
-	write(0x7F);*/
   /* Infinite loop */
-	int16_t ampstate = 1100;
-	int32_t timestate = 100000;
+	int16_t ampstate = 0;
+	int timestate = 0;
 	char numlist1[4] = {'0', '0', '0', '0'};
 	char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
-  for(;;)
-  {
-	osDelay(50);
+  for(;;) {
+	osDelay(25);
 	command(0x01);
 	osDelay(2);
     ampstate = set_amplitude_scale(read_amplitude_dial());
-    for(int i = 4; i > 0; i--)
-    {
+    osMutexAcquire(UserInputScaleHandle, osWaitForever);
+    	protected_vertical_scale_state = ampstate;
+    osMutexRelease(UserInputScaleHandle);
+    for(int i = 3; i >= 0; i--) {
     	numlist1[i] = '0' + (ampstate % 10);
     	ampstate = ampstate / 10;
     }
-    for(int i = 1; i < 5; i++)
-    {
+    for(int i = 0; i < 4; i++) {
     	write(numlist1[i]);
     }
     write('m');
     write('V');
     write(0x10);
     write(0x10);
-    timestate = set_time_scale(read_time_dial());
-    for(int i = 6; i > 0; i--)
-    {
-    	numlist2[i] = '0' + (timestate % 10);
-    	timestate = timestate / 10;
+    read_time_dial(&timestate);
+    osMutexAcquire(UserInputScaleHandle, osWaitForever);
+    	protected_horizontal_scale_state = timestate;
+    osMutexRelease(UserInputScaleHandle);
+    int time_value = get_time_scale(timestate);
+    for(int i = 5; i >= 0; i--) {
+    	numlist2[i] = '0' + (time_value % 10);
+    	time_value = time_value / 10;
     }
-    for(int i = 1; i < 7; i++)
-        {
-        	write(numlist2[i]);
-        }
+    for(int i = 0; i < 6; i++) {
+        write(numlist2[i]);
+    }
     write(0xE4);
     write('S');
   }
