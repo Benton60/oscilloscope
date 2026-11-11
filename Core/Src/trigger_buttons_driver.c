@@ -112,13 +112,13 @@ int8_t read_trigger_buttons()
 	}
 	if (p == FALL)
 		{
-			return 1;
+			return 100;
 		}
 	else
 	{
 		if (n == FALL)
 		{
-			return -1;
+			return -100;
 		}
 		else
 		{

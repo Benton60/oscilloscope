@@ -27,6 +27,7 @@
 #include "voltage_data_points_holder.h"
 #include "amplitude_dial_driver.h"
 #include "time_dial_driver.h"
+#include "trigger_buttons_driver.h"
 #include <stdint.h>
 #include <stdlib.h>
 /* USER CODE END Includes */
@@ -197,10 +198,12 @@ void StartDefaultTask(void *argument)
 void CharDisplayMain(void *argument)
 {
   /* USER CODE BEGIN CharDisplay */
-  char numlist1[4] = {'0', '0', '0', '0'};
-  char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
+  char numlistamp[4] = {'0', '0', '0', '0'};
+  char numlisttime[6] = {'0', '0', '0', '0', '0', '0'};
+  char numlisttrig[4] = {'0', '0', '0', '0'};
   int16_t varampstate = 0;
   int vartimestate = 0;
+  uint16_t vartrigstate = 0;
   init();
   /* Infinite loop */
   for(;;) {
@@ -211,11 +214,11 @@ void CharDisplayMain(void *argument)
 	varampstate = protected_vertical_scale_state;
 	osMutexRelease(UserInputScaleHandle);
     for(int i = 3; i >= 0; i--) {
-    	numlist1[i] = '0' + (varampstate % 10);
+    	numlistamp[i] = '0' + (varampstate % 10);
     	varampstate = varampstate / 10;
     }
     for(int i = 0; i < 4; i++) {
-    	write(numlist1[i]);
+    	write(numlistamp[i]);
     }
     write('m');
     write('V');
@@ -225,14 +228,26 @@ void CharDisplayMain(void *argument)
     vartimestate = get_time_scale(protected_horizontal_scale_state);
     osMutexRelease(UserInputScaleHandle);
     for(int i = 5; i >= 0; i--) {
-    	numlist2[i] = '0' + (vartimestate % 10);
+    	numlisttime[i] = '0' + (vartimestate % 10);
     	vartimestate = vartimestate / 10;
     }
     for(int i = 0; i < 6; i++) {
-        write(numlist2[i]);
+        write(numlisttime[i]);
     }
     write(0xE4);
     write('S');
+    osMutexAcquire(UserInputScaleHandle, osWaitForever);
+        vartrigstate = protected_trigger_height;
+    osMutexRelease(UserInputScaleHandle);
+    for(int i = 3; i >= 0; i--) {
+       	numlisttrig[i] = '0' + (vartrigstate % 10);
+       	vartrigstate = vartrigstate / 10;
+    }
+    for(int i = 0; i < 4; i++) {
+      	write(numlisttrig[i]);
+    }
+    write('m');
+    write('V');
   }
   /* USER CODE END CharDisplay */
 }
@@ -247,19 +262,33 @@ void CharDisplayMain(void *argument)
 void UserInputMain(void *argument)
 {
   /* USER CODE BEGIN UserInput */
-	int16_t ampstate = 0;
 	int timestate = 0;
+	int triggerchange = 0;
   /* Infinite loop */
   for(;;)
   {
 	  osDelay(5);
-	  ampstate = set_amplitude_scale(read_amplitude_dial());
 	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
-	  	  protected_vertical_scale_state = ampstate;
+	  	  protected_vertical_scale_state = set_amplitude_scale(read_amplitude_dial());
 	  osMutexRelease(UserInputScaleHandle);
 	  read_time_dial(&timestate);
 	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
 	  	  protected_horizontal_scale_state = timestate;
+	  osMutexRelease(UserInputScaleHandle);
+	  triggerchange = read_trigger_buttons();
+	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
+	  	  if(protected_trigger_height != 0)
+	  	  {
+	  		protected_trigger_height += triggerchange;
+	  	  }
+	  	  if(triggerchange > 0)
+	  	  {
+	  		protected_trigger_state = 1;
+	  	  }
+	  	  else if(triggerchange < 0)
+	  	  {
+	  		protected_trigger_state = 0;
+	  	  }
 	  osMutexRelease(UserInputScaleHandle);
   }
   /* USER CODE END UserInput */
