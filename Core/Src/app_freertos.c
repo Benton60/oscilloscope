@@ -65,17 +65,29 @@ const osThreadAttr_t defaultTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 128 * 4
 };
-/* Definitions for char_diplay */
-osThreadId_t char_diplayHandle;
+/* Definitions for CharDisplay */
+osThreadId_t CharDisplayHandle;
 uint32_t MyBufferTask02[ 128 ];
 osStaticThreadDef_t MycontrolBlocTask02;
-const osThreadAttr_t char_diplay_attributes = {
-  .name = "char_diplay",
+const osThreadAttr_t CharDisplay_attributes = {
+  .name = "CharDisplay",
   .stack_mem = &MyBufferTask02[0],
   .stack_size = sizeof(MyBufferTask02),
   .cb_mem = &MycontrolBlocTask02,
   .cb_size = sizeof(MycontrolBlocTask02),
   .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for UserInput */
+osThreadId_t UserInputHandle;
+uint32_t MyBufferTask03[ 128 ];
+osStaticThreadDef_t MycontrolBlocTask03;
+const osThreadAttr_t UserInput_attributes = {
+  .name = "UserInput",
+  .stack_mem = &MyBufferTask03[0],
+  .stack_size = sizeof(MyBufferTask03),
+  .cb_mem = &MycontrolBlocTask03,
+  .cb_size = sizeof(MycontrolBlocTask03),
+  .priority = (osPriority_t) osPriorityHigh3,
 };
 /* Definitions for UserInputScale */
 osMutexId_t UserInputScaleHandle;
@@ -121,8 +133,11 @@ void MX_FREERTOS_Init(void) {
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* creation of char_diplay */
-  char_diplayHandle = osThreadNew(StartTask02, NULL, &char_diplay_attributes);
+  /* creation of CharDisplay */
+  CharDisplayHandle = osThreadNew(CharDisplayMain, NULL, &CharDisplay_attributes);
+
+  /* creation of UserInput */
+  UserInputHandle = osThreadNew(UserInputMain, NULL, &UserInput_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -172,57 +187,40 @@ void StartDefaultTask(void *argument)
   /* USER CODE END defaultTask */
 }
 
-/* USER CODE BEGIN Header_StartTask02 */
+/* USER CODE BEGIN Header_CharDisplayMain */
 /**
-* @brief Function implementing the char_diplay thread.
+* @brief Function implementing the CharDisplay thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTask02 */
-void StartTask02(void *argument)
+/* USER CODE END Header_CharDisplayMain */
+void CharDisplayMain(void *argument)
 {
-  /* USER CODE BEGIN char_diplay */
-	init();
+  /* USER CODE BEGIN CharDisplay */
   /* Infinite loop */
-	int16_t ampstate = 0;
-	int timestate = 0;
-	char numlist1[4] = {'0', '0', '0', '0'};
-	char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
-  for(;;) {
-	osDelay(15);
-	command(0x01);
-	osDelay(2);
-    ampstate = set_amplitude_scale(read_amplitude_dial());
-    osMutexAcquire(UserInputScaleHandle, osWaitForever);
-    	protected_vertical_scale_state = ampstate;
-    osMutexRelease(UserInputScaleHandle);
-    for(int i = 3; i >= 0; i--) {
-    	numlist1[i] = '0' + (ampstate % 10);
-    	ampstate = ampstate / 10;
-    }
-    for(int i = 0; i < 4; i++) {
-    	write(numlist1[i]);
-    }
-    write('m');
-    write('V');
-    write(0x10);
-    write(0x10);
-    read_time_dial(&timestate);
-    osMutexAcquire(UserInputScaleHandle, osWaitForever);
-    	protected_horizontal_scale_state = timestate;
-    osMutexRelease(UserInputScaleHandle);
-    int time_value = get_time_scale(timestate);
-    for(int i = 5; i >= 0; i--) {
-    	numlist2[i] = '0' + (time_value % 10);
-    	time_value = time_value / 10;
-    }
-    for(int i = 0; i < 6; i++) {
-        write(numlist2[i]);
-    }
-    write(0xE4);
-    write('S');
+  for(;;)
+  {
+    osDelay(1);
   }
-  /* USER CODE END char_diplay */
+  /* USER CODE END CharDisplay */
+}
+
+/* USER CODE BEGIN Header_UserInputMain */
+/**
+* @brief Function implementing the UserInput thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_UserInputMain */
+void UserInputMain(void *argument)
+{
+  /* USER CODE BEGIN UserInput */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END UserInput */
 }
 
 /* Private application code --------------------------------------------------*/

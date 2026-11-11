@@ -325,4 +325,5 @@ boardIOC=true
 rtos.0.ip=STMicroelectronics.X-CUBE-FREERTOS.1.6.0
 rtos.0.mutexes.0=allocationType,Static;controlBlockName,UserInputScaleControlBlock01;name,UserInputScale
 rtos.0.tasks.0=allocationType,Dynamic;bufferName,NULL;codeGen,Default;controlBlockName,NULL;entry,StartDefaultTask;name,defaultTask;parameter,NULL;priority,osPriorityNormal;stackSize,128
-rtos.0.tasks.1=allocationType,Static;bufferName,MyBufferTask02;codeGen,Default;controlBlockName,MycontrolBlocTask02;entry,StartTask02;name,char_diplay;parameter,NULL;priority,osPriorityLow;stackSize,128
+rtos.0.tasks.1=allocationType,Static;bufferName,MyBufferTask02;codeGen,Default;controlBlockName,MycontrolBlocTask02;entry,CharDisplayMain;name,CharDisplay;parameter,NULL;priority,osPriorityLow;stackSize,128
+rtos.0.tasks.2=allocationType,Static;bufferName,MyBufferTask03;codeGen,Default;controlBlockName,MycontrolBlocTask03;entry,UserInputMain;name,UserInput;parameter,NULL;priority,osPriorityHigh3;stackSize,128

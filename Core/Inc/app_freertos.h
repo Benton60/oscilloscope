@@ -58,7 +58,8 @@ extern uint16_t protected_trigger_height;
 
 /* USER CODE END EM */
 extern osThreadId_t defaultTaskHandle;
-extern osThreadId_t char_diplayHandle;
+extern osThreadId_t CharDisplayHandle;
+extern osThreadId_t UserInputHandle;
 extern osMutexId_t UserInputScaleHandle;
 
 /* Exported function prototypes -----------------------------------------------*/
@@ -67,7 +68,8 @@ extern osMutexId_t UserInputScaleHandle;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
-void StartTask02(void *argument);
+void CharDisplayMain(void *argument);
+void UserInputMain(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
