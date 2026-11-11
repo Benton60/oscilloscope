@@ -104,7 +104,7 @@ void fill_mode2_buffer(uint16_t horizontal_scale_state, uint16_t * adcBuffer, ui
     //                              2 aka read 128 and interpolate 128, 50000 us 
     //                              4 aka read 64  and interpolate 192, 25000 us
     static int scales[3] = {256, 128, 64};
-    static int multiplier = horizontal_scale_state - 6;
+    int multiplier = horizontal_scale_state - 6;
     for(int i = 0; i < scales[multiplier]; i++) {
     	LL_ADC_REG_StartConversion(ADC1);
     	osDelay(1);
