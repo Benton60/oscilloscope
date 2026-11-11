@@ -197,23 +197,22 @@ void StartDefaultTask(void *argument)
 void CharDisplayMain(void *argument)
 {
   /* USER CODE BEGIN CharDisplay */
+  char numlist1[4] = {'0', '0', '0', '0'};
+  char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
+  int16_t varampstate = 0;
+  int vartimestate = 0;
   init();
   /* Infinite loop */
-	int16_t ampstate = 0;
-	int timestate = 0;
-	char numlist1[4] = {'0', '0', '0', '0'};
-	char numlist2[6] = {'0', '0', '0', '0', '0', '0'};
   for(;;) {
-	osDelay(15);
+	osDelay(200);
 	command(0x01);
 	osDelay(2);
-    ampstate = set_amplitude_scale(read_amplitude_dial());
-    osMutexAcquire(UserInputScaleHandle, osWaitForever);
-    	protected_vertical_scale_state = ampstate;
-    osMutexRelease(UserInputScaleHandle);
+	osMutexAcquire(UserInputScaleHandle, osWaitForever);
+	varampstate = protected_vertical_scale_state;
+	osMutexRelease(UserInputScaleHandle);
     for(int i = 3; i >= 0; i--) {
-    	numlist1[i] = '0' + (ampstate % 10);
-    	ampstate = ampstate / 10;
+    	numlist1[i] = '0' + (varampstate % 10);
+    	varampstate = varampstate / 10;
     }
     for(int i = 0; i < 4; i++) {
     	write(numlist1[i]);
@@ -222,14 +221,12 @@ void CharDisplayMain(void *argument)
     write('V');
     write(0x10);
     write(0x10);
-    read_time_dial(&timestate);
     osMutexAcquire(UserInputScaleHandle, osWaitForever);
-    	protected_horizontal_scale_state = timestate;
+    vartimestate = get_time_scale(protected_horizontal_scale_state);
     osMutexRelease(UserInputScaleHandle);
-    int time_value = get_time_scale(timestate);
     for(int i = 5; i >= 0; i--) {
-    	numlist2[i] = '0' + (time_value % 10);
-    	time_value = time_value / 10;
+    	numlist2[i] = '0' + (vartimestate % 10);
+    	vartimestate = vartimestate / 10;
     }
     for(int i = 0; i < 6; i++) {
         write(numlist2[i]);
@@ -250,10 +247,20 @@ void CharDisplayMain(void *argument)
 void UserInputMain(void *argument)
 {
   /* USER CODE BEGIN UserInput */
+	int16_t ampstate = 0;
+	int timestate = 0;
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  osDelay(5);
+	  ampstate = set_amplitude_scale(read_amplitude_dial());
+	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
+	  	  protected_vertical_scale_state = ampstate;
+	  osMutexRelease(UserInputScaleHandle);
+	  read_time_dial(&timestate);
+	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
+	  	  protected_horizontal_scale_state = timestate;
+	  osMutexRelease(UserInputScaleHandle);
   }
   /* USER CODE END UserInput */
 }
