@@ -25,13 +25,16 @@ void ADC_Start_DMA(void * adcBuffer) {
     LL_ADC_REG_StartConversion(ADC1);
 }
 
-void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_buffer_null) {
-    uint16_t * adcBuffer = adcBuffer_null;
-    uint8_t * screen_buffer = screen_buffer_null;
+void transfer_adc_buffer_to_screen_buffer(uint16_t * current_horizontal_state, uint16_t * adcBuffer, uint8_t * screen_buffer) {
     osMutexAcquire(UserInputScaleHandle, osWaitForever);
-    uint16_t vertical_scale = protected_vertical_scale_state;             	// 100 - 3300
-    uint16_t horizontal_scale_state = protected_horizontal_scale_state;     // 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
-    uint16_t trigger_level  = protected_trigger_height;             		// 0 - 3300
+    uint16_t vertical_scale = protected_vertical_scale_state;               // 100 - 3300
+    uint16_t horizontal_scale_state = *current_horizontal_state;
+    if(*current_horizontal_state != protected_horizontal_scale_state){
+        horizontal_scale_state = protected_horizontal_scale_state;          // 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
+        *current_horizontal_state = protected_horizontal_scale_state;
+        set_adc_clock_prescalar(horizontal_scale_state); //changes the pre-scalar based on horizontal_scale 
+    }
+    uint16_t trigger_level = protected_trigger_height;             		    // 0 - 3300
     uint16_t trigger_direction = protected_trigger_state;             		// 1 - up, 0 - down
     osMutexRelease(UserInputScaleHandle);
 
@@ -41,16 +44,16 @@ void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_b
     // the extra DMA space is so that the trigger can "shift"...
     // where from the DMA buffer the data is being pulled from.
     int trigger_offset = 0;
-    for(int i = 0; i < 145; i++){   // will time out and just draw the screen if no trigger is detected
-        if((adcBuffer[i] <= trigger_level && adcBuffer[i+1] > trigger_level) && trigger_direction){             //checks smaller than, bigger than, rising
+    for(int i = 0; i < 135; i++){   // will time out and just draw the screen if no trigger is detected
+        if(trigger_direction && (adcBuffer[i] <= trigger_level && adcBuffer[i+1] > trigger_level)){             //checks smaller than, bigger than, rising
             break;
-        } else if((adcBuffer[i] >= trigger_level && adcBuffer[i+1] < trigger_level) && ~trigger_direction) {    //checks bigger than, smaller than, falling
+        } else if(trigger_direction == 0 && (adcBuffer[i] > trigger_level && adcBuffer[i+1] <= trigger_level)){
             break;
         }
         trigger_offset++;
     }
     for(int i = trigger_offset; i < SCREEN_COLUMNS + trigger_offset; i++) {
-        int pixels_up = adcBuffer[i] * SCREEN_ROWS / 4096 * 3300 / vertical_scale;
+        int pixels_up = adcBuffer[i] * SCREEN_ROWS * 3300 / 4096 / vertical_scale;
         int page = pixels_up / 8;
         int pixels_up_per_page = pixels_up % 8;
         for(int j = 0; j < 8; j++) {
@@ -61,31 +64,44 @@ void transfer_adc_buffer_to_screen_buffer(void * adcBuffer_null, void * screen_b
             }
         }
     }
-    set_adc_clock_prescalar(horizontal_scale_state); //changes the pre-scalar based on horizontal_scale 
     LL_ADC_REG_StartConversion(ADC1);
 }
 
 void set_adc_clock_prescalar(uint16_t horizontal_scale_state) {
     //the first five horizontal scales are controlled via ADC pre-scalar aka MODE 1, where-as everything after 1000 u.s. or pre-scalar 10 must be done in software aka MODE 2
+
+    LL_ADC_Disable(ADC1);
+    while (LL_ADC_IsEnabled(ADC1)) {}
     switch (horizontal_scale_state) {
-        case 1:
+        case 0:
             LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV1);
             break;
-        case 2: 
+        case 1: 
             LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV2);
             break;
-        case 3:
+        case 2:
             LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV4);
             break;
-        case 4: 
+        case 3: 
             LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV6);
             break;
-        case 5:
+        case 4:
             LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV8);
             break;
-        default:
+        case 5:
             LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV10);
             break;
+        default:
+            LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_ASYNC_DIV1);
+            break;
     }
+    LL_ADC_Enable(ADC1);
 }
 
+void fill_mode2_buffer(uint16_t * horizontal_scale_state, uint16_t * adcBuffer, uint16_t * adcMode2Buffer) {
+    for(int i = 0; i < 256; i++) {
+    	LL_ADC_REG_StartConversion(ADC1);
+    	osDelay(1);
+    	adcMode2Buffer[i] = adcBuffer[1];
+    }
+} 
