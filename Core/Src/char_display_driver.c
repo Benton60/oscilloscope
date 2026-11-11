@@ -42,17 +42,17 @@ void write(char i)
 void init()
 {
 	GPIOB -> ODR &= ~(1<<10);
-	osDelay(45);
+	osDelay(45); //Start setup
 	command(0x30);
 	osDelay(5);
 	command(0x30);
 	osDelay(1);
 	command(0x30);
-	osDelay(1);
-	command(0x38);
-	command(0x10);
-	command(0x0c);
-	command(0x06);
-	command(0x01);
+	osDelay(1); //End setup
+	command(0x38); //Line number, font size, bits of input
+	command(0x10); //Shift, don't change
+	command(0x0c); //Display on, cursors off
+	command(0x06); //Entry Mode
+	command(0x01); //Clear Display
 	osDelay(2);
 }
