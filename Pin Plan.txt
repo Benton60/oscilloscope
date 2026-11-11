@@ -6,7 +6,7 @@ ADC1_IN0 : PC0
 
 Encoder : PB12 & PB13 for Time, PB14 & PB15 for Amplitude
 
-Buttons : PA5 & PA6 for Trigger Level
+Buttons : PA4 & PA5 for Trigger Level
 
 SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select, PC8 for Data/Command, PC9 as reset
 
