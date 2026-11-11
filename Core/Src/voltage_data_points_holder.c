@@ -103,9 +103,9 @@ void fill_mode2_buffer(uint16_t horizontal_scale_state, uint16_t * adcBuffer, ui
     // The possible multipliers are 1 aka a direct copy from adcBuffer[0] to adcMode2Buffer. This corresponds to 100000 us or 10 Hz
     //                              2 aka read 128 and interpolate 128, 50000 us 
     //                              4 aka read 64  and interpolate 192, 25000 us
-    static int scales[3] = {256, 128, 64};
+    static int scales[3] = {64, 128, 256};
     int multiplier = horizontal_scale_state - 6;
-    for(int i = 0; i < scales[multiplier]; i++) {
+    for(int i = 0; i < scales[multiplier-1]; i += multiplier) {
     	LL_ADC_REG_StartConversion(ADC1);
     	osDelay(1);
         for(int j = 0; j < multiplier; j++){

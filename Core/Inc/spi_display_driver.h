@@ -11,7 +11,7 @@ SPI Display Driver
 #ifndef SRC_SPI_DISPLAY_DRIVER_H_
 #define SRC_SPI_DISPLAY_DRIVER_H_
 
-#define SCREEN_COLUMNS 120
+#define SCREEN_COLUMNS 102
 #define SCREEN_ROWS 64
 void * draw_SPI_screen();
 
