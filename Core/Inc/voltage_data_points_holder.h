@@ -13,6 +13,6 @@ Voltage Data Points Holder
 void set_adc_clock_prescalar(uint16_t horizontal_scale_state);
 void ADC_Start_DMA(void *);
 void transfer_adc_buffer_to_screen_buffer(uint16_t * current_horizontal_state, uint16_t * adcBuffer, uint8_t * screen_buffer);
-void fill_mode2_buffer(uint16_t * current_horizontal_state, uint16_t * adcBuffer, uint16_t * adcMode2Buffer);
+void fill_mode2_buffer(uint16_t current_horizontal_state, uint16_t * adcBuffer, uint16_t * adcMode2Buffer);
 
 #endif

@@ -2,6 +2,7 @@
 #include "app_freertos.h"
 #include "spi_display_driver.h"
 #include "main.h"
+#include <stdint.h>
 
 void ADC_Start_DMA(void * adcBuffer) {
     LL_ADC_Enable(ADC1);
@@ -98,10 +99,17 @@ void set_adc_clock_prescalar(uint16_t horizontal_scale_state) {
     LL_ADC_Enable(ADC1);
 }
 
-void fill_mode2_buffer(uint16_t * horizontal_scale_state, uint16_t * adcBuffer, uint16_t * adcMode2Buffer) {
-    for(int i = 0; i < 256; i++) {
+void fill_mode2_buffer(uint16_t horizontal_scale_state, uint16_t * adcBuffer, uint16_t * adcMode2Buffer) {
+    // The possible multipliers are 1 aka a direct copy from adcBuffer[0] to adcMode2Buffer. This corresponds to 100000 us or 10 Hz
+    //                              2 aka read 128 and interpolate 128, 50000 us 
+    //                              4 aka read 64  and interpolate 192, 25000 us
+    static int scales[3] = {256, 128, 64};
+    static int multiplier = horizontal_scale_state - 6;
+    for(int i = 0; i < scales[multiplier]; i++) {
     	LL_ADC_REG_StartConversion(ADC1);
     	osDelay(1);
-    	adcMode2Buffer[i] = adcBuffer[1];
+        for(int j = 0; j < multiplier; j++){
+    	    adcMode2Buffer[i + j] = adcBuffer[0];
+        }
     }
 } 
