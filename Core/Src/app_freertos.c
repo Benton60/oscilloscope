@@ -176,7 +176,7 @@ void StartDefaultTask(void *argument)
             adc_buffer_ready = 0;
             if(horizontal_current_state > 5) { //states above five need to use an intermediate buffer
                 uint16_t adcMode2Buffer[256];
-                fill_mode2_buffer(&horizontal_current_state, adcBuffer, adcMode2Buffer); 
+                fill_mode2_buffer(horizontal_current_state, adcBuffer, adcMode2Buffer); 
                 transfer_adc_buffer_to_screen_buffer(&horizontal_current_state, adcMode2Buffer, screen_buffer);
             } else { //we can just pass the unmodified adcBuffer to be transferred to the screen buffer for states 0-5
                 transfer_adc_buffer_to_screen_buffer(&horizontal_current_state, adcBuffer, screen_buffer);
