@@ -1,10 +1,16 @@
 #include "voltage_data_points_holder.h"
+#include "time_dial_driver.h"
 #include "app_freertos.h"
 #include "spi_display_driver.h"
 #include "main.h"
+#include "FreeRTOS.h"
+#include "queue.h"
 #include <stdint.h>
 
+
+
 void ADC_Start_DMA(void * adcBuffer) {
+
     LL_ADC_Enable(ADC1);
     LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_1);
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_1);
@@ -26,15 +32,9 @@ void ADC_Start_DMA(void * adcBuffer) {
     LL_ADC_REG_StartConversion(ADC1);
 }
 
-void transfer_adc_buffer_to_screen_buffer(uint16_t * current_horizontal_state, uint16_t * adcBuffer, uint8_t * screen_buffer) {
+void transfer_adc_buffer_to_screen_buffer(uint16_t * adcBuffer, uint8_t * screen_buffer) {
     osMutexAcquire(UserInputScaleHandle, osWaitForever);
     uint16_t vertical_scale = protected_vertical_scale_state;               // 100 - 3300
-    uint16_t horizontal_scale_state = *current_horizontal_state;
-    if(*current_horizontal_state != protected_horizontal_scale_state){
-        horizontal_scale_state = protected_horizontal_scale_state;          // 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
-        *current_horizontal_state = protected_horizontal_scale_state;
-        set_adc_clock_prescalar(horizontal_scale_state); //changes the pre-scalar based on horizontal_scale 
-    }
     uint16_t trigger_level = protected_trigger_height;             		    // 0 - 3300
     uint16_t trigger_direction = protected_trigger_state;             		// 1 - up, 0 - down
     osMutexRelease(UserInputScaleHandle);
@@ -45,7 +45,7 @@ void transfer_adc_buffer_to_screen_buffer(uint16_t * current_horizontal_state, u
     // the extra DMA space is so that the trigger can "shift"...
     // where from the DMA buffer the data is being pulled from.
     int trigger_offset = 0;
-    for(int i = 0; i < 135; i++){   // will time out and just draw the screen if no trigger is detected
+    for(int i = 0; i < SCREEN_COLUMNS; i++){   // will time out and just draw the screen if no trigger is detected
         if(trigger_direction && (adcBuffer[i] <= trigger_level && adcBuffer[i+1] > trigger_level)){             //checks smaller than, bigger than, rising
             break;
         } else if(trigger_direction == 0 && (adcBuffer[i] > trigger_level && adcBuffer[i+1] <= trigger_level)){
@@ -70,7 +70,6 @@ void transfer_adc_buffer_to_screen_buffer(uint16_t * current_horizontal_state, u
 
 void set_adc_clock_prescalar(uint16_t horizontal_scale_state) {
     //the first five horizontal scales are controlled via ADC pre-scalar aka MODE 1, where-as everything after 1000 u.s. or pre-scalar 10 must be done in software aka MODE 2
-
     LL_ADC_Disable(ADC1);
     while (LL_ADC_IsEnabled(ADC1)) {}
     switch (horizontal_scale_state) {
@@ -99,17 +98,39 @@ void set_adc_clock_prescalar(uint16_t horizontal_scale_state) {
     LL_ADC_Enable(ADC1);
 }
 
-void fill_mode2_buffer(uint16_t horizontal_scale_state, uint16_t * adcBuffer, uint16_t * adcMode2Buffer) {
-    // The possible multipliers are 1 aka a direct copy from adcBuffer[0] to adcMode2Buffer. This corresponds to 100000 us or 10 Hz
-    //                              2 aka read 128 and interpolate 128, 50000 us 
-    //                              4 aka read 64  and interpolate 192, 25000 us
-    static int scales[3] = {64, 128, 256};
-    int multiplier = horizontal_scale_state - 6;
-    for(int i = 0; i < scales[multiplier-1]; i += multiplier) {
-    	LL_ADC_REG_StartConversion(ADC1);
-    	osDelay(1);
-        for(int j = 0; j < multiplier; j++){
-    	    adcMode2Buffer[i + j] = adcBuffer[0];
-        }
+void fill_mode2_buffer(uint16_t horizontal_scale_state, uint16_t * adcMode2Buffer) {
+	adc_use_interrupts = 1;
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 1);
+    int mode2_state_number = (horizontal_scale_state - NUM_MODE1_STATES);
+    static uint32_t possible_count[NUM_MODE2_STATES] = {7845, 15690, 31370, 78430, 156860, 235290, 313720};
+	set_timer_prescalar(1, possible_count[mode2_state_number]);
+	osMessageQueueReset(adcQueueHandle);
+    for(int i = 0; i < SCREEN_COLUMNS * 2; i++) {
+    	xQueueReceive(adcQueueHandle, &adcMode2Buffer[i],  portMAX_DELAY);
     }
-} 
+    adc_use_interrupts = 0;
+    LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 256);
+    LL_TIM_DisableCounter(TIM3);
+}
+
+void set_timer_prescalar(uint32_t prescaler, uint32_t count){
+    if (count == 0) {
+        return;
+    }
+    LL_TIM_DisableCounter(TIM3);
+    LL_TIM_SetPrescaler(TIM3, prescaler);
+    LL_TIM_SetAutoReload(TIM3, count - 1);
+    LL_TIM_SetCounter(TIM3, 0);
+    // Load the pre-scaler and auto-reload values.
+    LL_TIM_GenerateEvent_UPDATE(TIM3);
+    LL_TIM_ClearFlag_UPDATE(TIM3);
+    LL_TIM_EnableIT_UPDATE(TIM3);
+    LL_TIM_EnableCounter(TIM3);
+}
+
+
+
+
+
+
+

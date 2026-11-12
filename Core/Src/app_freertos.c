@@ -28,12 +28,12 @@
 #include "amplitude_dial_driver.h"
 #include "time_dial_driver.h"
 #include "trigger_buttons_driver.h"
-#include <stdint.h>
-#include <stdlib.h>
+#include "main.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 typedef StaticTask_t osStaticThreadDef_t;
+typedef StaticQueue_t osStaticMessageQDef_t;
 typedef StaticSemaphore_t osStaticMutexDef_t;
 /* USER CODE BEGIN PTD */
 
@@ -57,6 +57,7 @@ uint16_t protected_vertical_scale_state = 3300;	    // vertical scale defaults t
 int protected_horizontal_scale_state = 1000;		//horizontal scale defaults to 1000
 uint8_t protected_trigger_state = 1;				//trigger defaults to rising
 uint16_t protected_trigger_height = 1500; 			//trigger defaults to 2v
+
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -98,6 +99,17 @@ const osMutexAttr_t UserInputScale_attributes = {
   .cb_mem = &UserInputScaleControlBlock01,
   .cb_size = sizeof(UserInputScaleControlBlock01),
 };
+/* Definitions for adcQueue */
+osMessageQueueId_t adcQueueHandle;
+uint8_t adcQueueBuffer[ 32 * sizeof( uint16_t ) ];
+osStaticMessageQDef_t adcQueueControlBlock01;
+const osMessageQueueAttr_t adcQueue_attributes = {
+  .name = "adcQueue",
+  .cb_mem = &adcQueueControlBlock01,
+  .cb_size = sizeof(adcQueueControlBlock01),
+  .mq_mem = &adcQueueBuffer,
+  .mq_size = sizeof(adcQueueBuffer)
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -127,6 +139,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
+  /* creation of adcQueue */
+  adcQueueHandle = osMessageQueueNew (32, sizeof(uint16_t), &adcQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -160,30 +174,24 @@ void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN defaultTask */
 
-	//This code starts the DMA ADC conversions IT SHOULD NOT BE REMOVED EVER
-    uint16_t * adcBuffer = (uint16_t *) malloc(256 * sizeof(uint16_t)); //I'm using dynamic allocation because the stack size is only 512 bytes so this buffer fills
-                                                                        //the stack by itself. Plus, this is during initialization so it doesn't break any commandments.
-	ADC_Start_DMA(adcBuffer);
-	//
-
-
-
 	uint8_t *screen_buffer = init_spi_screen();
     uint16_t horizontal_current_state = 5;
     clear_screen();
     for(;;){
     	osDelay(10);
-        if(adc_buffer_ready) {
-            adc_buffer_ready = 0;
-            if(horizontal_current_state > 5) { //states above five need to use an intermediate buffer
-                uint16_t adcMode2Buffer[256];
-                fill_mode2_buffer(horizontal_current_state, adcBuffer, adcMode2Buffer); 
-                transfer_adc_buffer_to_screen_buffer(&horizontal_current_state, adcMode2Buffer, screen_buffer);
-            } else { //we can just pass the unmodified adcBuffer to be transferred to the screen buffer for states 0-5
-                transfer_adc_buffer_to_screen_buffer(&horizontal_current_state, adcBuffer, screen_buffer);
-            }
-            draw_SPI_screen();
+    	if(horizontal_current_state != protected_horizontal_scale_state){
+    		// 1 - 11           NOTE -- the horizontal scale is stored as a state NOT A VALUE
+    	    horizontal_current_state = protected_horizontal_scale_state;
+    	    set_adc_clock_prescalar(horizontal_current_state); //changes the pre-scalar based on horizontal_scale
+    	}
+        if(horizontal_current_state > 5) { //states above five need to use Mode 2
+            uint16_t adcMode2Buffer[256];
+            fill_mode2_buffer(horizontal_current_state, adcMode2Buffer);
+            transfer_adc_buffer_to_screen_buffer(adcMode2Buffer, screen_buffer);
+        } else { //we can just pass the unmodified adcBuffer to be transferred to the screen buffer for states 0-5
+            transfer_adc_buffer_to_screen_buffer(adcBuffer, screen_buffer);
         }
+        draw_SPI_screen();
     }
   /* USER CODE END defaultTask */
 }

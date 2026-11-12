@@ -22,6 +22,9 @@
 #include "stm32u0xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "app_freertos.h"
+#include "FreeRTOS.h"
+#include "queue.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,8 +44,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-volatile int adc_buffer_ready = 0;
-
+volatile int adc_use_interrupts = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -111,13 +113,12 @@ void DMA1_Channel1_IRQHandler(void)
 /**
  * @brief DMA1 Channel 1 interrupt handler.
  */
-    if (LL_DMA_IsActiveFlag_TC1(DMA1))
-    {
+    if (LL_DMA_IsActiveFlag_TC1(DMA1)) {
         // Clear transfer complete flag
         LL_DMA_ClearFlag_TC1(DMA1);
-
-        // Tell the application that the ADC buffer is ready
-        adc_buffer_ready = 1;
+        uint16_t adcValue = adcBuffer[0];
+        BaseType_t higherPriorityTaskWoken = pdFALSE;
+        xQueueSendFromISR(adcQueueHandle, &adcValue, &higherPriorityTaskWoken);
     }
 
     if (LL_DMA_IsActiveFlag_TE1(DMA1))
@@ -137,12 +138,30 @@ void DMA1_Channel1_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-
+    if (LL_TIM_IsActiveFlag_UPDATE(TIM3)){
+        LL_TIM_ClearFlag_UPDATE(TIM3);
+        if (adc_use_interrupts && LL_ADC_IsEnabled(ADC1) && !LL_ADC_REG_IsConversionOngoing(ADC1)) {
+            LL_ADC_REG_StartConversion(ADC1);
+        }
+    }
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
 
   /* USER CODE END TIM3_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM6, DAC and LPTIM1 global Interrupts (combined with EXTI 31).
+  */
+void TIM6_DAC_LPTIM1_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM6_DAC_LPTIM1_IRQn 0 */
+
+  /* USER CODE END TIM6_DAC_LPTIM1_IRQn 0 */
+  /* USER CODE BEGIN TIM6_DAC_LPTIM1_IRQn 1 */
+
+  /* USER CODE END TIM6_DAC_LPTIM1_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

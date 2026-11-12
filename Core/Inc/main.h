@@ -39,6 +39,7 @@ extern "C" {
 #include "stm32u0xx_ll_cortex.h"
 #include "stm32u0xx_ll_utils.h"
 #include "stm32u0xx_ll_spi.h"
+#include "stm32u0xx_ll_tim.h"
 #include "stm32u0xx_ll_gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -65,7 +66,8 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-extern volatile int adc_buffer_ready;
+extern volatile int adc_use_interrupts;
+extern uint16_t * adcBuffer;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
