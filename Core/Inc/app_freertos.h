@@ -41,6 +41,7 @@ extern uint16_t protected_vertical_scale_state;
 extern int protected_horizontal_scale_state;
 extern uint8_t protected_trigger_state;
 extern uint16_t protected_trigger_height;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -61,6 +62,7 @@ extern osThreadId_t defaultTaskHandle;
 extern osThreadId_t CharDisplayHandle;
 extern osThreadId_t UserInputHandle;
 extern osMutexId_t UserInputScaleHandle;
+extern osMessageQueueId_t adcQueueHandle;
 
 /* Exported function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
