@@ -102,8 +102,8 @@ void fill_mode2_buffer(uint16_t horizontal_scale_state, uint16_t * adcMode2Buffe
 	adc_use_interrupts = 1;
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 1);
     int mode2_state_number = (horizontal_scale_state - NUM_MODE1_STATES);
-    static uint32_t possible_count[NUM_MODE2_STATES] = {7845, 15690, 31370, 78430, 156860, 235290, 313720};
-	set_timer_prescalar(1, possible_count[mode2_state_number]);
+    static uint32_t possible_count[NUM_MODE2_STATES] = {243, 485, 970, 1937, 3875, 7750, 15500};
+	set_timer_prescalar(0, possible_count[mode2_state_number]);
 	osMessageQueueReset(adcQueueHandle);
     for(int i = 0; i < SCREEN_COLUMNS * 2; i++) {
     	xQueueReceive(adcQueueHandle, &adcMode2Buffer[i],  portMAX_DELAY);
