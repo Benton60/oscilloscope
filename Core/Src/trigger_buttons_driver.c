@@ -126,10 +126,3 @@ int8_t read_trigger_buttons()
 		}
 	}
 }
-
-void get_trigger_value()
-{
-	return; /*TODO*/
-}
-
-

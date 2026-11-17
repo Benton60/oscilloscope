@@ -9,16 +9,6 @@
 #include "main.h"
 #include "app_freertos.h"
 
-void draw_char_screen()
-{
-	return; /*TODO*/
-}
-
-void init_char_display()
-{
-	return;
-}
-
 void command(char i)
 {
 	GPIOB -> ODR = (GPIOB -> ODR & ~0xFF) | i;

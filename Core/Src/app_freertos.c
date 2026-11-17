@@ -299,7 +299,7 @@ void UserInputMain(void *argument)
 	  	  {
 	  		protected_trigger_state = 1;
 	  	  }
-	  	  else if(triggerchange < 0)
+	  	  else
 	  	  {
 	  		protected_trigger_state = 0;
 	  	  }
