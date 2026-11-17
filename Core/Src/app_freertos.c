@@ -215,7 +215,7 @@ void CharDisplayMain(void *argument)
   init();
   /* Infinite loop */
   for(;;) {
-	osDelay(200);
+	osDelay(400);
 	command(0x01);
 	osDelay(2);
 	osMutexAcquire(UserInputScaleHandle, osWaitForever);
@@ -244,6 +244,7 @@ void CharDisplayMain(void *argument)
     }
     write(0xE4);
     write('S');
+    command(0xC0);
     osMutexAcquire(UserInputScaleHandle, osWaitForever);
         vartrigstate = protected_trigger_height;
     osMutexRelease(UserInputScaleHandle);
@@ -285,7 +286,12 @@ void UserInputMain(void *argument)
 	  osMutexRelease(UserInputScaleHandle);
 	  triggerchange = read_trigger_buttons();
 	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
-	  	  if(protected_trigger_height != 0)
+	  	  if(protected_trigger_height <= 100)
+	  	  {
+	  		protected_trigger_height = 100;
+	  		protected_trigger_height += triggerchange;
+	  	  }
+	  	  else
 	  	  {
 	  		protected_trigger_height += triggerchange;
 	  	  }
