@@ -31,7 +31,7 @@ int get_time_scale(int time_state) {
     // the slowest pre-scalar available, 10, corresponds to 1 period of a 1kHz wave or 1000 u.s.
     // the other values stored in the table are calculated based on this value. 
     // these values should be changed b4 presentation to exactly match the true frequencies they display
-    static int lookup_table[NUM_STATES] = {100, 200, 400, 600, 800, 1000, 2500, 5000, 10000, 25000, 50000, 75000, 100000};
+    static int lookup_table[NUM_STATES] = {100, 200, 400, 600, 800, 1000, 25000, 50000, 75000, 100000};
     //these values are in micro seconds aka u.s.
     return lookup_table[time_state];
 }
