@@ -196,7 +196,7 @@ void ADCTask(void *argument)
         } else { //we can just pass the unmodified adcBuffer to be transferred to the screen buffer for states 0-5
             transfer_adc_buffer_to_screen_buffer(adcBuffer, screen_buffer);
         }
-        draw_SPI_screen();
+        draw_spi_screen(screen_buffer);
     }
   /* USER CODE END defaultTask */
 }

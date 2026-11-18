@@ -13,13 +13,13 @@ SPI Display Driver
 
 #define SCREEN_COLUMNS 102
 #define SCREEN_ROWS 64
-void * draw_SPI_screen();
+#define SCREEN_PAGES 8
+
+void draw_spi_screen(uint8_t * screen_buffer);
 
 void send_command(uint8_t command);
 
-void * init_spi_screen();
-
-void * get_screen_buffer();
+uint8_t * init_spi_screen();
 
 void set_column(uint8_t column);
 

@@ -106,7 +106,10 @@ void fill_mode2_buffer(uint16_t horizontal_scale_state, uint16_t * adcMode2Buffe
 	set_timer_prescalar(0, possible_count[mode2_state_number]);
 	osMessageQueueReset(adcQueueHandle);
     for(int i = 0; i < SCREEN_COLUMNS * 2; i++) {
-    	xQueueReceive(adcQueueHandle, &adcMode2Buffer[i],  portMAX_DELAY);
+    	if(!xQueueReceive(adcQueueHandle, &adcMode2Buffer[i],  portMAX_DELAY)){
+            //If the receive fails it just displays a blank pixel
+            adcMode2Buffer[i] = 0;
+        };
     }
     adc_use_interrupts = 0;
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, 256);

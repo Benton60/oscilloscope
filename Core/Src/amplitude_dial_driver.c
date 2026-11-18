@@ -26,13 +26,13 @@ int8_t read_amplitude_dial() {
 
 int16_t set_amplitude_scale(int8_t up_or_down) {
 	static int16_t amplitude_state = 3300;
-	if(up_or_down<0) {
+	if(up_or_down<0) { // Rule seven compliance
 		if(amplitude_state==100) {
 			amplitude_state=200;
 		}
 		amplitude_state-=100;
 	}
-	if(up_or_down>0) {
+	if(up_or_down>0) { // Rule seven compliance
 		if(amplitude_state==3300) {
 			amplitude_state=3200;
 		}
