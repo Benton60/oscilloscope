@@ -281,7 +281,7 @@ void UserInputMain(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  osDelay(5);
+	  osDelay(10);
 	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
 	  	  protected_vertical_scale_state = set_amplitude_scale(read_amplitude_dial());
 	  osMutexRelease(UserInputScaleHandle);
@@ -304,7 +304,7 @@ void UserInputMain(void *argument)
 	  	  {
 	  		protected_trigger_state = 1;
 	  	  }
-	  	  else
+	  	  else if (triggerchange < 0)
 	  	  {
 	  		protected_trigger_state = 0;
 	  	  }
