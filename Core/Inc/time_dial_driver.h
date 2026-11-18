@@ -12,7 +12,7 @@ Time Dial Driver
 #define NUM_MODE1_STATES 6
 #define NUM_MODE2_STATES 4
 
-void read_time_dial(int * time_state); //we need to modify time_state so we pass a reference
+int read_time_dial(int time_state); //we need to modify time_state so we pass a reference
 int get_time_scale();
 
 #endif 
