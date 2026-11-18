@@ -58,7 +58,7 @@ extern uint16_t protected_trigger_height;
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
-extern osThreadId_t defaultTaskHandle;
+extern osThreadId_t ADCTaskHandle;
 extern osThreadId_t CharDisplayHandle;
 extern osThreadId_t UserInputHandle;
 extern osMutexId_t UserInputScaleHandle;
@@ -69,7 +69,7 @@ extern osMessageQueueId_t adcQueueHandle;
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void ADCTask(void *argument);
 void CharDisplayMain(void *argument);
 void UserInputMain(void *argument);
 

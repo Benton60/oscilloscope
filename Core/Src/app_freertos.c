@@ -60,12 +60,17 @@ uint16_t protected_trigger_height = 1500; 			//trigger defaults to 2v
 
 
 /* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for ADCTask */
+osThreadId_t ADCTaskHandle;
+uint32_t MyBufferTask00[ 512 ];
+osStaticThreadDef_t MycontrolBlocTask00;
+const osThreadAttr_t ADCTask_attributes = {
+  .name = "ADCTask",
+  .stack_mem = &MyBufferTask00[0],
+  .stack_size = sizeof(MyBufferTask00),
+  .cb_mem = &MycontrolBlocTask00,
+  .cb_size = sizeof(MycontrolBlocTask00),
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 512 * 4
 };
 /* Definitions for CharDisplay */
 osThreadId_t CharDisplayHandle;
@@ -145,8 +150,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of ADCTask */
+  ADCTaskHandle = osThreadNew(ADCTask, NULL, &ADCTask_attributes);
 
   /* creation of CharDisplay */
   CharDisplayHandle = osThreadNew(CharDisplayMain, NULL, &CharDisplay_attributes);
@@ -163,14 +168,14 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_EVENTS */
 
 }
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_ADCTask */
 /**
-* @brief Function implementing the defaultTask thread.
+* @brief Function implementing the ADCTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_ADCTask */
+void ADCTask(void *argument)
 {
   /* USER CODE BEGIN defaultTask */
 
