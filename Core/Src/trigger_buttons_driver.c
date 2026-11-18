@@ -11,15 +11,9 @@
 int8_t read_trigger_buttons()
 {
 	static enum btn_status p = HIGH;
-	switch (p)
-	{
+	switch (p) {
 	case HIGH:
-		if (GPIOA -> IDR & (1<<4))
-		{
-			break;
-		}
-		else
-		{
+		if (!(GPIOA -> IDR & (1<<4))) {
 			p = H_BOUNCE_DELAY;
 		}
 		break;
@@ -27,49 +21,24 @@ int8_t read_trigger_buttons()
 		p = HIGH;
 		break;
 	case H_BOUNCE_DELAY:
-		if (GPIOA -> IDR & (1<<4))
-		{
-			p = HIGH;
-		}
-		else
-		{
-			p = FALL;
-		}
-		break;
+        p = (GPIOA -> IDR & (1<<4)) ? RISE : FALL;
+        break;
 	case FALL:
 		p = LOW;
 		break;
 	case LOW:
-		if (GPIOA -> IDR & (1<<4))
-		{
+		if (GPIOA -> IDR & (1<<4)) {
 			p = L_BOUNCE_DELAY;
-		}
-		else
-		{
-			break;
-		}
+		} 
 		break;
 	case L_BOUNCE_DELAY:
-		if (GPIOA -> IDR & (1<<4))
-		{
-			p = RISE;
-		}
-		else
-		{
-			p = LOW;
-		}
-		break;
+        p = (GPIOA -> IDR & (1<<4)) ? RISE : LOW;
+        break;
 	}
 	static enum btn_status n = HIGH;
-	switch (n)
-	{
+	switch (n) {
 	case HIGH:
-		if (GPIOA -> IDR & (1<<5))
-		{
-			break;
-		}
-		else
-		{
+		if (!(GPIOA -> IDR & (1<<5))) {
 			n = H_BOUNCE_DELAY;
 		}
 		break;
@@ -77,52 +46,23 @@ int8_t read_trigger_buttons()
 		n = HIGH;
 		break;
 	case H_BOUNCE_DELAY:
-		if (GPIOA -> IDR & (1<<5))
-		{
-			n = HIGH;
-		}
-		else
-		{
-			n = FALL;
-		}
+        n = (GPIOA -> IDR & (1<<5)) ? HIGH : FALL;
 		break;
 	case FALL:
 		n = LOW;
 		break;
 	case LOW:
-		if (GPIOA -> IDR & (1<<5))
-		{
+		if (GPIOA -> IDR & (1<<5)) {
 			n = L_BOUNCE_DELAY;
-		}
-		else
-		{
-			break;
-		}
+		} 
 		break;
 	case L_BOUNCE_DELAY:
-		if (GPIOA -> IDR & (1<<5))
-		{
-			n = RISE;
-		}
-		else
-		{
-			n = LOW;
-		}
+        n = (GPIOA -> IDR & (1<<5)) ? RISE : LOW;
 		break;
 	}
-	if (p == FALL)
-		{
-			return 100;
-		}
-	else
-	{
-		if (n == FALL)
-		{
-			return -100;
-		}
-		else
-		{
-			return 0;
-		}
+	if (p == FALL) {
+		return 100;
+	} else {
+		return (n == FALL) ? -100 : 0;
 	}
 }
