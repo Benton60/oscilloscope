@@ -8,8 +8,6 @@
 #include "amplitude_dial_driver.h"
 #include "main.h"
 
-int16_t amplitude_state = 3300;
-
 int8_t read_amplitude_dial() {
     static uint8_t state = 0;
     static const int8_t table[16] = {
@@ -27,6 +25,7 @@ int8_t read_amplitude_dial() {
 }
 
 int16_t set_amplitude_scale(int8_t up_or_down) {
+	static int16_t amplitude_state = 3300;
 	if(up_or_down<0) {
 		if(amplitude_state==100) {
 			amplitude_state=200;
