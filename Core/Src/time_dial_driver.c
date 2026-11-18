@@ -3,7 +3,7 @@
 #include "main.h"
 
 
-void read_time_dial(int * time_state){
+int read_time_dial(int time_state){
     static uint8_t state = 0;
     static const int8_t table[16] = {
          0, -1,  1,  0,
@@ -15,16 +15,16 @@ void read_time_dial(int * time_state){
     uint8_t b = (GPIOB->IDR >> 13) & 1;
     //State calculation
     state = ((state << 2) | (a << 1) | b) & 0x0F;
-    *time_state += table[state]; //Benton added this line. Because the time_state variable is being switched to holding a state rather than
+    time_state += table[state]; //Benton added this line. Because the time_state variable is being switched to holding a state rather than
                                 //the scale value this function doesn't need to return anything. 
                                 //I did this because scaling horizontally depends on the pre-scalar values available which aren't described by any formula. 
                                 //As such a "lookup table" will be used to get the value we display to the screen instead of storing the value as the "state".
-    if(*time_state == -1) {
-        *time_state = 0;        //can't let the state drop below zero obv.
-    } else if(*time_state == NUM_STATES) {
-        *time_state = NUM_STATES - 1;
+    if(time_state == -1) {
+        time_state = 0;        //can't let the state drop below zero obv.
+    } else if(time_state == NUM_STATES) {
+        time_state = NUM_STATES - 1;
     }
-    //return table[state];
+    return time_state;
 }
 
 int get_time_scale(int time_state) {

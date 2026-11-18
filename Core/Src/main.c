@@ -44,7 +44,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint16_t * adcBuffer;
+uint16_t * adcBuffer;   // the adcBuffer is hardware defined it exists in only one place which is why it gets global scope
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

@@ -285,7 +285,7 @@ void UserInputMain(void *argument)
 	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
 	  	  protected_vertical_scale_state = set_amplitude_scale(read_amplitude_dial());
 	  osMutexRelease(UserInputScaleHandle);
-	  read_time_dial(&timestate);
+	  timestate = read_time_dial(timestate);
 	  osMutexAcquire(UserInputScaleHandle, osWaitForever);
 	  	  protected_horizontal_scale_state = timestate;
 	  osMutexRelease(UserInputScaleHandle);
