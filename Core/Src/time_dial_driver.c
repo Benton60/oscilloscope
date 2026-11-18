@@ -1,6 +1,7 @@
 
 #include "time_dial_driver.h"
 #include "main.h"
+#include <assert.h>
 
 
 int read_time_dial(int time_state){
@@ -24,6 +25,8 @@ int read_time_dial(int time_state){
     } else if(time_state == NUM_STATES) {
         time_state = NUM_STATES - 1;
     }
+    assert(time_state < NUM_STATES);
+    assert(time_state >= 0);
     return time_state;
 }
 
@@ -37,6 +40,9 @@ int get_time_scale(int time_state) {
     } else if(time_state > NUM_STATES) {
         return lookup_table[NUM_STATES - 1];
     }
+
+    assert(time_state < NUM_STATES);
+    assert(time_state >= 0);
     //these values are in micro seconds aka u.s.
     return lookup_table[time_state];
 }

@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "voltage_data_points_holder.h"
 #include "stdlib.h"
+#include <assert.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -102,6 +103,7 @@ int main(void)
   //This code starts the DMA ADC conversions IT SHOULD NOT BE REMOVED EVER
     adcBuffer = (uint16_t *) malloc(256 * sizeof(uint16_t)); 				//I'm using dynamic allocation because the stack size is only 512 bytes so this buffer fills
                                                                             //the stack by itself. Plus, this is during initialization so it doesn't break any commandments.
+    assert(adcBuffer);
 
     LL_TIM_DisableCounter(TIM3);
     LL_TIM_DisableIT_UPDATE(TIM3);

@@ -8,12 +8,13 @@
 #include "spi_display_driver.h"
 #include "app_freertos.h"
 #include "stdlib.h"
+#include <assert.h>
 
 void draw_spi_screen(uint8_t * screen_buffer) {
+    assert(screen_buffer);
     for(int i = 0; i < 8; i++) {
         set_page(i);
         set_column(0x00);
-
         for(int j = 0; j < SCREEN_COLUMNS; j++) {
             send_byte(screen_buffer[i * SCREEN_COLUMNS + j]);
         }
@@ -24,11 +25,9 @@ uint8_t * init_spi_screen(){
     uint8_t * screen_buffer = (uint8_t *) malloc(SCREEN_COLUMNS * 8); // Memory allocation but it's during the initialization.
     //SPI1 : PA1 for CLK, PA7 for MOSI, PC7 for Select, PC8 for Data/Command, PC9 for Reset
     LL_SPI_Enable(SPI1);
-    
     GPIOC->ODR &= ~(1<<9);  // drive the screen reset low aka reset the screen before initialization
     osDelay(10);            // Wait for the screen to register the reset
     GPIOC->ODR |= (1<<9);   // drive reset back high 
-
     //Initialization sequence, I can't be bothered to explain what each byte does.
     uint8_t init[] = {0x40, 0xa1, 0xc0, 0xa4, 0xa6, 0xa2, 0x2f, 0x27, 0x81, 0x10, 0xfa, 0x90, 0xaf}; 
     for(int i = 0; i < 13; i++){

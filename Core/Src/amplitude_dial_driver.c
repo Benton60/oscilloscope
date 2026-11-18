@@ -7,6 +7,7 @@
 
 #include "amplitude_dial_driver.h"
 #include "main.h"
+#include <assert.h>
 
 int8_t read_amplitude_dial() {
     static uint8_t state = 0;
@@ -21,6 +22,8 @@ int8_t read_amplitude_dial() {
     uint8_t b = (GPIOB->IDR >> 15) & 1;
 
     state = ((state << 2) | (a << 1) | b) & 0x0F;
+    assert(state >= 0);
+    assert(state < 16);
     return table[state];
 }
 
@@ -38,5 +41,7 @@ int16_t set_amplitude_scale(int8_t up_or_down) {
 		}
 		amplitude_state+=100;
 	}
+    assert(amplitude_state <= 3300);
+    assert(amplitude_state >= 100);
 	return amplitude_state;
 }

@@ -91,7 +91,6 @@ extern uint16_t * adcBuffer;
 #define SWCLK_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
-
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

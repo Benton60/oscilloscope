@@ -5,18 +5,16 @@
 #include "main.h"
 #include "FreeRTOS.h"
 #include "queue.h"
+#include <assert.h>
 #include <stdint.h>
 
 
 
 void ADC_Start_DMA(void * adcBuffer) {
-
     LL_ADC_Enable(ADC1);
     LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_1);
     LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_1);
-
     while (!LL_ADC_IsActiveFlag_ADRDY(ADC1)){}
-
     LL_DMA_ConfigAddresses(
         DMA1,
         LL_DMA_CHANNEL_1,
@@ -24,21 +22,23 @@ void ADC_Start_DMA(void * adcBuffer) {
         (uint32_t) adcBuffer,
         LL_DMA_DIRECTION_PERIPH_TO_MEMORY
     );
-
     LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1, ADC_BUFFER_SIZE);
-
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_1);
-
     LL_ADC_REG_StartConversion(ADC1);
 }
 
 void transfer_adc_buffer_to_screen_buffer(uint16_t * adcBuffer, uint8_t * screen_buffer) {
     osMutexAcquire(UserInputScaleHandle, osWaitForever);
     uint16_t vertical_scale = protected_vertical_scale_state;               // 100 - 3300
-    uint16_t trigger_level = protected_trigger_height;             		    // 0 - 3300
+    uint16_t trigger_level = protected_trigger_height;             		    // 0 - infinite
     uint16_t trigger_direction = protected_trigger_state;             		// 1 - up, 0 - down
     osMutexRelease(UserInputScaleHandle);
 
+    assert(vertical_scale <= 3300);
+    assert(vertical_scale >= 0);
+    assert(trigger_level >= 0);
+    assert(trigger_direction <= 1);
+    assert(trigger_direction >= 0);
 
     // Only 120 pixels can be shown on the screen at once...
     // my ADC DMA buffer can hold 256...
@@ -69,6 +69,8 @@ void transfer_adc_buffer_to_screen_buffer(uint16_t * adcBuffer, uint8_t * screen
 }
 
 void set_adc_clock_prescalar(uint16_t horizontal_scale_state) {
+    assert(horizontal_scale_state >= 0);
+    assert(horizontal_scale_state <= NUM_STATES);
     //the first five horizontal scales are controlled via ADC pre-scalar aka MODE 1, where-as everything after 1000 u.s. or pre-scalar 10 must be done in software aka MODE 2
     LL_ADC_Disable(ADC1);
     while (LL_ADC_IsEnabled(ADC1)) {}
